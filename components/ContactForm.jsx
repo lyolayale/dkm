@@ -202,7 +202,7 @@ export default function ContactForm() {
 
         <button
           type="submit"
-          className={`btn btn-solid relative justify-center ${status === "sending" ? "pointer-events-none opacity-75" : ""}`}
+          className={`btn btn-solid relative justify-center ${status === "sending" ? "pointer-events-none opacity-75" : ""} hover:bg-amber-500`}
         >
           {status === "sending" && (
             <span

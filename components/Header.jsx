@@ -61,7 +61,10 @@ export default function Header() {
             </span>
           </button>
 
-          <a className="btn btn-solid hidden lg:inline-flex" href="#pricing">
+          <a
+            className="btn btn-solid hidden lg:inline-flex hover:bg-amber-500"
+            href="#pricing"
+          >
             From $600 <Icon name="arrow" />
           </a>
 

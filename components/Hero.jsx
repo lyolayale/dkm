@@ -18,7 +18,7 @@ export default function Hero() {
               <strong className="font-semibold">$600</strong>.
             </p>
             <div className="flex flex-wrap gap-3">
-              <a className="btn btn-solid" href="#contact">
+              <a className="btn btn-solid hover:bg-amber-500" href="#contact">
                 Start yours — $600 <Icon name="arrow" />
               </a>
               <a className="btn btn-ghost" href="#pricing">

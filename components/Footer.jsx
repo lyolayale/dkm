@@ -65,6 +65,14 @@ export default function Footer() {
             <ul className="grid gap-[9px]">
               <li>
                 <a
+                  href="tel:+15551234567"
+                  className="text-[15px] text-ink-2 transition-colors hover:text-ink"
+                >
+                  (555) 123-4567
+                </a>
+              </li>
+              <li>
+                <a
                   href="mailto:hello@dkmstudio.co"
                   className="text-[15px] text-ink-2 transition-colors hover:text-ink"
                 >
@@ -72,12 +80,9 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a
-                  href="#pricing"
-                  className="text-[15px] text-ink-2 transition-colors hover:text-ink"
-                >
-                  Care plan — $50/mo
-                </a>
+                <span className="text-[15px] text-ink-2">
+                  2084 Faulkner Rd NE, Atlanta, GA 30324
+                </span>
               </li>
             </ul>
           </div>

@@ -158,7 +158,10 @@ export default function Estimator() {
           A starting point, not a trap — you&rsquo;ll get a fixed quote in
           writing before anything is owed.
         </p>
-        <button className="btn btn-solid" onClick={requestQuote}>
+        <button
+          className="btn btn-solid hover:bg-amber-500"
+          onClick={requestQuote}
+        >
           Request this quote <Icon name="arrow" />
         </button>
         <p className="mt-4 text-[13px] text-ink-3">
