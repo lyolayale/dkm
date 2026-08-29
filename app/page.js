@@ -1,61 +1,97 @@
-"use client";
+import Header from "@/components/Header";
+import Hero from "@/components/Hero";
+import Services from "@/components/Services";
+import Process from "@/components/Process";
+import Pricing from "@/components/Pricing";
+import FAQ from "@/components/FAQ";
+import Contact from "@/components/Contact";
+import Footer from "@/components/Footer";
+import { FAQ_ITEMS } from "@/lib/faq";
 
-import { useEffect, useState } from "react";
-import Head from "next/head";
+export const metadata = {
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    siteName: "DKM",
+    title: "DKM — Websites for Small Businesses, Starting at $600",
+    description:
+      "Design, build, and launch — everything included. Fixed quotes from $600, live in as little as two weeks.",
+    url: "/",
+    images: [
+      {
+        url: "/og.png",
+        width: 1200,
+        height: 630,
+        alt: "DKM — websites starting at $600",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "DKM — Websites Starting at $600",
+    description:
+      "Fast, professional websites for small businesses. Fixed quotes, no hidden fees.",
+    images: ["/og.png"],
+  },
+};
 
-import Navbar from "./components/Navbar";
-import Hero from "./components/Hero";
-import About from "./components/About";
-import Vision from "./components/Vision";
-import Projects from "./components/Projects";
-import Location from "./components/Location";
-import Contact from "./components/Contact";
-import Footer from "./components/Footer";
+// Structured data: Organization + WebSite + Service (with $600) + FAQ
+// FAQ answers come from lib/faq.js so the page and Google schema can never drift apart
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      name: "DKM",
+      url: "/",
+      email: "hello@dkmstudio.co", // EDIT:EMAIL
+    },
+    { "@type": "WebSite", name: "DKM", url: "/" },
+    {
+      "@type": "Service",
+      name: "Website design and development",
+      serviceType: "Web design & development",
+      areaServed: "Worldwide",
+      provider: { "@type": "Organization", name: "DKM" },
+      offers: {
+        "@type": "AggregateOffer",
+        priceCurrency: "USD",
+        lowPrice: "600",
+        highPrice: "3000",
+        offerCount: "3",
+      },
+    },
+    {
+      "@type": "FAQPage",
+      mainEntity: FAQ_ITEMS.map(item => ({
+        "@type": "Question",
+        name: item.q,
+        acceptedAnswer: { "@type": "Answer", text: item.a },
+      })),
+    },
+  ],
+};
 
 export default function Home() {
-  const [darkMode, setDarkMode] = useState(false);
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("dkm-theme");
-    if (savedTheme === "dark") {
-      setDarkMode(true);
-    }
-  }, []);
-
-  const toggleTheme = () => {
-    const nextTheme = !darkMode;
-    setDarkMode(nextTheme);
-    localStorage.setItem("dkm-theme", nextTheme ? "dark" : "light");
-  };
-
-  const themeClass = darkMode
-    ? "bg-slate-950 text-slate-300 selection:text-amber-300 selection:bg-amber-400/30"
-    : "bg-white text-slate-800 selection:text-amber-900 selection:bg-amber-400/30";
-
   return (
-    <div
-      id="home"
-      className={`min-h-screen font-sans transition-colors duration-300 ${themeClass}`}
-    >
-      <Head>
-        <title>
-          Digital Keys & Marketing | Premium Brand Activation & Web Development
-        </title>
-        <meta
-          name="description"
-          content="We unlock modern business growth. Premium Next.js web application designs coupled with relentless boots-on-the-ground exposure strategies."
-        />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      </Head>
-
-      <Navbar darkMode={darkMode} toggleTheme={toggleTheme} />
-      <Hero darkMode={darkMode} />
-      <About darkMode={darkMode} />
-      <Vision darkMode={darkMode} />
-      <Projects darkMode={darkMode} />
-      <Location darkMode={darkMode} />
-      <Contact darkMode={darkMode} />
-      <Footer darkMode={darkMode} />
-    </div>
+    <>
+      <a className="skip" href="#main">
+        Skip to content
+      </a>
+      <Header />
+      <main id="main">
+        <Hero />
+        <Services />
+        <Process />
+        <Pricing />
+        <FAQ />
+        <Contact />
+      </main>
+      <Footer />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+    </>
   );
 }
