@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import Reveal from "./Reveal";
 import Icon from "./Icon";
 import TierButton from "./TierButton";
@@ -52,8 +55,9 @@ const TIERS = [
     ctaLabel: "Request a custom quote",
     features: [
       "Everything in Growth",
-      "E-commerce, portals, integrations",
-      "Databases & workflow automation",
+      "E-commerce & web portals",
+      "Supabase database apps",
+      "Custom workflow automation",
       "Ongoing partnership option",
       "Quoted to scope, always fixed",
     ],
@@ -62,6 +66,7 @@ const TIERS = [
 
 const MONTHLY_PLANS = [
   {
+    id: "care",
     name: "Care plan",
     price: 50,
     desc: "Your website, kept healthy.",
@@ -72,28 +77,57 @@ const MONTHLY_PLANS = [
     ],
   },
   {
+    id: "lite",
     name: "Automation Lite",
     price: 39,
     desc: "Form handling & notifications.",
     points: [
       "Up to 3 workflows",
-      "n8n hosting, monitoring, updates",
+      "n8n hosting & monitoring",
       "Fixes within 2 business days",
     ],
   },
   {
-    name: "Automation Standard",
-    price: 99,
-    desc: "CRM sync, scheduling, alerts.",
+    id: "app",
+    name: "App Care",
+    price: 79,
+    desc: "Database & backend security.",
     points: [
-      "Up to 10 workflows",
-      "Fixes within 1 business day",
-      "30 min of tweaks monthly",
+      "Database schema versioning",
+      "Supabase RLS & auth audits",
+      "1 hr of data tweaks monthly",
     ],
   },
 ];
 
 export default function Pricing() {
+  // Track selected upfront tier name and active monthly items
+  const [selectedTier, setSelectedTier] = useState("Launch");
+  const [selectedMonthly, setSelectedMonthly] = useState(["care"]); // care active by default
+
+  const handleToggleMonthly = id => {
+    setSelectedMonthly(prev =>
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id],
+    );
+  };
+
+  // Get pricing value numbers cleanly
+  const activeTierObj = TIERS.find(t => t.name === selectedTier);
+  const basePriceNum = parseInt(activeTierObj.price.replace(/[^0-9]/g, ""), 10);
+
+  // Calculate total monthly aggregation
+  let totalMonthly = selectedMonthly.reduce((sum, itemId) => {
+    const plan = MONTHLY_PLANS.find(p => p.id === itemId);
+    return sum + (plan ? plan.price : 0);
+  }, 0);
+
+  // Apply bundle discount rule: Care Plan ($50) + App Care ($79) together saves $15
+  const hasBundleDiscount =
+    selectedMonthly.includes("care") && selectedMonthly.includes("app");
+  if (hasBundleDiscount) {
+    totalMonthly -= 15;
+  }
+
   return (
     <section id="pricing" className="sec">
       <div className="wrap">
@@ -110,9 +144,11 @@ export default function Pricing() {
           </p>
         </header>
 
+        {/* --- UPFRONT TIERS LIST --- */}
         <Reveal>
           <div className="overflow-hidden rounded-[18px] border border-line-strong bg-raised transition-colors duration-[350ms]">
             {TIERS.map(t => {
+              const isSelected = selectedTier === t.name;
               const tone = t.featured
                 ? {
                     row: "bg-feat border-feat-line",
@@ -136,10 +172,14 @@ export default function Pricing() {
                     check: "text-accent-bright",
                     go: "border-line-strong text-ink hover:border-btn hover:bg-btn hover:text-btn-text",
                   };
+
               return (
                 <article
                   key={t.name}
-                  className={`grid gap-5 border-b p-[30px] last:border-b-0 lg:grid-cols-[1.15fr_210px_1.7fr_56px] lg:items-center lg:gap-[30px] lg:p-[36px] ${tone.row}`}
+                  onClick={() => setSelectedTier(t.name)}
+                  className={`grid gap-5 border-b p-[30px] last:border-b-0 lg:grid-cols-[1.15fr_210px_1.7fr_56px] lg:items-center lg:gap-[30px] lg:p-[36px] cursor-pointer transition-all ${
+                    tone.row
+                  } ${isSelected ? "ring-2 ring-accent-bright ring-offset-2 ring-offset-raised" : "opacity-90 hover:opacity-100"}`}
                 >
                   <div>
                     {t.tag && (
@@ -148,8 +188,15 @@ export default function Pricing() {
                       </span>
                     )}
                     <h3
-                      className={`mb-[3px] font-serif text-[25px] font-medium ${tone.name}`}
+                      className={`mb-[3px] font-serif text-[25px] font-medium flex items-center gap-2 ${tone.name}`}
                     >
+                      <div
+                        className={`w-4 h-4 rounded-full border flex items-center justify-center ${isSelected ? "border-accent-bright" : "border-line-strong"}`}
+                      >
+                        {isSelected && (
+                          <div className="w-2 h-2 rounded-full bg-accent-bright" />
+                        )}
+                      </div>
                       {t.name}
                     </h3>
                     <p className={`text-[14.5px] ${tone.sub}`}>{t.sub}</p>
@@ -175,22 +222,33 @@ export default function Pricing() {
                         key={f}
                         className={`flex items-center gap-[7px] text-[14.5px] ${tone.feat}`}
                       >
-                        <Icon name="check" className={tone.check} /> {f}
+                        <Icon
+                          name="check"
+                          className={
+                            t.featured && isSelected
+                              ? "text-amber-400"
+                              : tone.check
+                          }
+                        />
+                        {f}
                       </li>
                     ))}
                   </ul>
-                  <TierButton
-                    tier={`${t.name} — ${t.price}`}
-                    budget={t.budget}
-                    ariaLabel={t.ctaLabel}
-                    btnClass={tone.go}
-                  />
+                  <div onClick={e => e.stopPropagation()}>
+                    <TierButton
+                      tier={`${t.name} — ${t.price}`}
+                      budget={t.budget}
+                      ariaLabel={t.ctaLabel}
+                      btnClass={tone.go}
+                    />
+                  </div>
                 </article>
               );
             })}
           </div>
         </Reveal>
 
+        {/* --- GENERAL BUSINESS TERMS --- */}
         <Reveal>
           <div className="mt-[26px] grid gap-6 sm:grid-cols-2">
             <div className="border-l-2 border-accent-bright pl-4">
@@ -212,50 +270,87 @@ export default function Pricing() {
           </div>
         </Reveal>
 
+        {/* --- STACKABLE MONTHLY MATRICES --- */}
         <Reveal>
-          <p className="mt-12 text-[13px] font-semibold uppercase tracking-[0.13em] text-ink-3">
-            Optional monthly plans — cancel anytime
-          </p>
-          <div className="mt-[18px] grid md:grid-cols-3">
-            {MONTHLY_PLANS.map(p => (
-              <div
-                key={p.name}
-                className="border-t border-line py-[18px] lg:border-l lg:border-t-0 lg:py-1 lg:pl-6 lg:first:border-l-0 lg:first:pl-0"
-              >
-                <h3 className="mb-2.5 font-serif text-[19px] font-medium">
-                  {p.name}
-                </h3>
-                <p className="font-serif text-[36px] font-medium leading-none tracking-tight">
-                  ${p.price}
-                  <span className="font-sans text-[14px] tracking-normal text-ink-3">
-                    /mo
-                  </span>
-                </p>
-                <p className="mb-3.5 mt-2 text-[14px] text-ink-3">{p.desc}</p>
-                <ul className="grid gap-2">
-                  {p.points.map(pt => (
-                    <li
-                      key={pt}
-                      className="flex items-start gap-2 text-[14px] text-ink-2"
-                    >
-                      <Icon name="check" className="mt-1 text-accent-bright" />{" "}
-                      {pt}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+          <div className="mt-12 flex flex-wrap items-baseline justify-between gap-2">
+            <p className="text-[13px] font-semibold uppercase tracking-[0.13em] text-ink-3">
+              Optional monthly plans — Choose all that apply (They Stack)
+            </p>
+            {hasBundleDiscount && (
+              <span className="text-[12px] font-bold text-emerald-500 uppercase tracking-wider bg-emerald-500/10 px-2 py-0.5 rounded animate-pulse">
+                🎉 App Bundle Activated (-$15/mo)
+              </span>
+            )}
           </div>
+
+          <div className="mt-[18px] grid grid-cols-1 gap-4 md:grid-cols-3">
+            {MONTHLY_PLANS.map(p => {
+              const isChecked = selectedMonthly.includes(p.id);
+              return (
+                <div
+                  key={p.id}
+                  onClick={() => handleToggleMonthly(p.id)}
+                  className={`border rounded-xl p-5 cursor-pointer transition-all duration-200 select-none ${
+                    isChecked
+                      ? "border-accent-bright bg-accent-bright/[0.03] shadow-sm"
+                      : "border-line bg-transparent hover:border-line-strong"
+                  }`}
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <h3 className="font-serif text-[19px] font-medium text-ink">
+                      {p.name}
+                    </h3>
+                    <div
+                      className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${
+                        isChecked
+                          ? "bg-accent-bright border-accent-bright"
+                          : "border-line-strong"
+                      }`}
+                    >
+                      {isChecked && (
+                        <Icon name="check" className="text-white text-[12px]" />
+                      )}
+                    </div>
+                  </div>
+                  <p className="font-serif text-[36px] font-medium leading-none tracking-tight text-ink">
+                    ${p.price}
+                    <span className="font-sans text-[14px] tracking-normal text-ink-3">
+                      {" "}
+                      /mo{" "}
+                    </span>
+                  </p>
+                  <p className="mb-3.5 mt-2 text-[14px] text-ink-3">{p.desc}</p>
+                  <ul className="grid gap-2">
+                    {p.points.map(pt => (
+                      <li
+                        key={pt}
+                        className="flex items-start gap-2 text-[14px] text-ink-2"
+                      >
+                        <Icon
+                          name="check"
+                          className="mt-1 text-accent-bright flex-shrink-0"
+                        />
+                        {pt}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })}
+          </div>
+
           <p className="mt-[22px] max-w-[72ch] text-[13.5px] text-ink-3">
-            Monthly plans cover running and maintaining your automations —
-            hosting, monitoring, updates, and fixes when a connected service
-            changes. Building new workflows is one-time work, typically
-            $150–350, always quoted fixed. Best value: care plan + Automation
-            Standard together for $129/mo. Fair use: 10,000 runs/month.
+            Monthly plans are fully additive depending on your unique site
+            requirements. Selecting both visual front-end{" "}
+            <strong>Care Plan</strong> and full <strong>App Care</strong>{" "}
+            databases applies an immediate bundle deduction value right in your
+            dashboard tracker.
           </p>
         </Reveal>
-
-        <Estimator />
+        {/* --- PROJECT SCOPE ESTIMATOR MODULE --- */}
+        <Reveal>
+          <Estimator />
+        </Reveal>
       </div>
     </section>
   );
