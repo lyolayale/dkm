@@ -77,8 +77,12 @@ export default function Estimator() {
         "Hi! I used the price estimator on your site.",
         "",
         `Pages: ${pages.label}`,
-        `Add-ons: ${addons.length ? addons.map(a => a.label).join(", ") : "none"}`,
+        `Add-ons: ${
+          addons.length ? addons.map(a => a.label).join(", ") : "none"
+        }`,
         `Estimate: about ${fmt(total)}`,
+        "",
+        "Automations I might need (form alerts, CRM sync, booking, etc.): ",
         "",
         "A bit about my business: ",
       ].join("\n"),
@@ -110,7 +114,9 @@ export default function Estimator() {
             {ADDONS.map(a => (
               <button
                 key={a.id}
-                className={`chip${addons.some(x => x.id === a.id) ? " active" : ""}`}
+                className={`chip${
+                  addons.some(x => x.id === a.id) ? " active" : ""
+                }`}
                 onClick={() => toggleAddon(a)}
               >
                 {a.label} <small>+${a.add.toLocaleString("en-US")}</small>
@@ -134,6 +140,9 @@ export default function Estimator() {
         <p className="est-break">
           Base $600 · {pages.label} ·{" "}
           {addons.length ? addons.map(a => a.label).join(", ") : "no add-ons"}
+        </p>
+        <p className="est-sub">
+          Optional monthly: care $50/mo · automations from $39/mo
         </p>
       </div>
     </div>

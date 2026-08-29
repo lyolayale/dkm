@@ -60,6 +60,39 @@ const TIERS = [
   },
 ];
 
+const MONTHLY_PLANS = [
+  {
+    name: "Care plan",
+    price: 50,
+    desc: "Your website, kept healthy.",
+    points: [
+      "Edits & content updates",
+      "Updates & backups",
+      "Priority support",
+    ],
+  },
+  {
+    name: "Automation Lite",
+    price: 39,
+    desc: "Form handling & notifications.",
+    points: [
+      "Up to 3 workflows",
+      "n8n hosting, monitoring, updates",
+      "Fixes within 2 business days",
+    ],
+  },
+  {
+    name: "Automation Standard",
+    price: 99,
+    desc: "CRM sync, scheduling, alerts.",
+    points: [
+      "Up to 10 workflows",
+      "Fixes within 1 business day",
+      "30 min of tweaks monthly",
+    ],
+  },
+];
+
 export default function Pricing() {
   return (
     <section className="sec" id="pricing">
@@ -111,19 +144,50 @@ export default function Pricing() {
         <Reveal>
           <div className="pricing-notes">
             <div>
-              <strong>Care plan — $50/mo</strong>
-              <span>
-                Edits, updates, backups, priority support. Cancel anytime.
-              </span>
-            </div>
-            <div>
               <strong>Payment plans</strong>
               <span>
                 50% to start, 50% at launch. Three-part splits on larger
                 projects. No hidden fees, ever.
               </span>
             </div>
+            <div>
+              <strong>Your domain &amp; hosting</strong>
+              <span>
+                Not included — stays in your name, typically $40–60/year total.
+                We set it up, you own it.
+              </span>
+            </div>
           </div>
+        </Reveal>
+
+        <Reveal>
+          <p className="plans-label">Optional monthly plans — cancel anytime</p>
+          <div className="plans">
+            {MONTHLY_PLANS.map(p => (
+              <div className="plan" key={p.name}>
+                <h3>{p.name}</h3>
+                <p className="plan-price">
+                  ${p.price}
+                  <span>/mo</span>
+                </p>
+                <p className="plan-desc">{p.desc}</p>
+                <ul>
+                  {p.points.map(pt => (
+                    <li key={pt}>
+                      <Icon name="check" /> {pt}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+          <p className="plans-note">
+            Monthly plans cover running and maintaining your automations —
+            hosting, monitoring, updates, and fixes when a connected service
+            changes. Building new workflows is one-time work, typically
+            $150–350, always quoted fixed. Best value: care plan + Automation
+            Standard together for $129/mo. Fair use: 10,000 runs/month.
+          </p>
         </Reveal>
 
         <Estimator />

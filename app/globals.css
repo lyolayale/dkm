@@ -442,6 +442,95 @@ section {
   font-size: 15px;
 }
 
+/* ==== MONTHLY PLAN (care + automation) ==== */
+.plans-label {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-top: 48px;
+}
+.plans {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 18px;
+}
+.plan {
+  border-left: 1px solid var(--line);
+  padding: 4px 24px 8px 24px;
+}
+.plan:first-child {
+  border-left: none;
+  padding-left: 0;
+}
+.plan h3 {
+  font-size: 19px;
+  margin-bottom: 10px;
+}
+.plan-price {
+  font-family: var(--font-fraunces), serif;
+  font-weight: 500;
+  font-size: 36px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.plan-price span {
+  font-family: var(--font-sans), sans-serif;
+  font-size: 14px;
+  color: var(--text-3);
+}
+.plan-desc {
+  color: var(--text-3);
+  font-size: 14px;
+  margin: 8px 0 14px;
+}
+.plan ul {
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+.plan ul li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text-2);
+}
+.plan ul .ic {
+  color: var(--accent-bright);
+  margin-top: 4px;
+  width: 0.9em;
+  height: 0.9em;
+}
+.plans-note {
+  color: var(--text-3);
+  font-size: 13.5px;
+  margin-top: 22px;
+  max-width: 72ch;
+}
+@media (max-width: 860px) {
+  .plans {
+    grid-template-columns: 1fr;
+  }
+  .plan {
+    border-left: none;
+    border-top: 1px solid var(--line);
+    padding: 18px 0 12px;
+  }
+  .plan:first-child {
+    border-top: none;
+    padding-top: 0;
+  }
+}
+
+/* Estimator */
+.est-sub {
+  color: var(--text-3);
+  font-size: 13px;
+  margin-top: 6px;
+}
+
 /* ============================================================ PRICING LEDGER */
 .tiers {
   border: 1px solid var(--line-strong);
