@@ -3,11 +3,10 @@
 import Icon from "./Icon";
 import { prefillAndGo } from "@/lib/quoteBus";
 
-// Sends the visitor to the contact form with this tier pre-selected
-export default function TierButton({ tier, budget, ariaLabel }) {
+export default function TierButton({ tier, budget, ariaLabel, btnClass = "" }) {
   return (
     <button
-      className="tier-go"
+      className={`hidden shrink-0 cursor-pointer items-center justify-center rounded-full border transition-colors duration-200 lg:inline-flex h-[50px] w-[50px] ${btnClass}`}
       aria-label={ariaLabel}
       onClick={() =>
         prefillAndGo({

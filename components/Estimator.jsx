@@ -34,11 +34,9 @@ export default function Estimator() {
         ? "Growth range"
         : "Custom range — quoted to scope";
 
-  // Animated count-up whenever the total changes
   useEffect(() => {
     const from = shownRef.current;
     if (from === total) return;
-
     const reduced = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
@@ -47,7 +45,6 @@ export default function Estimator() {
       setShown(total);
       return;
     }
-
     let raf;
     const t0 = performance.now();
     const tick = t => {
@@ -77,12 +74,8 @@ export default function Estimator() {
         "Hi! I used the price estimator on your site.",
         "",
         `Pages: ${pages.label}`,
-        `Add-ons: ${
-          addons.length ? addons.map(a => a.label).join(", ") : "none"
-        }`,
+        `Add-ons: ${addons.length ? addons.map(a => a.label).join(", ") : "none"}`,
         `Estimate: about ${fmt(total)}`,
-        "",
-        "Automations I might need (form alerts, CRM sync, booking, etc.): ",
         "",
         "A bit about my business: ",
       ].join("\n"),
@@ -91,57 +84,88 @@ export default function Estimator() {
   }
 
   return (
-    <div className="estimator reveal" id="estimator">
-      <div className="est-opts">
-        <div className="est-group">
-          <h3>How many pages?</h3>
-          <div className="chips" role="group" aria-label="Number of pages">
+    <div
+      id="estimator"
+      className="reveal mt-[84px] grid overflow-hidden rounded-[18px] border border-line-strong bg-raised transition-colors duration-[350ms] lg:grid-cols-[1.35fr_1fr]"
+    >
+      <div className="border-b border-line p-[30px] lg:border-b-0 lg:border-r lg:p-10">
+        <div className="mb-[30px] last:mb-0">
+          <h3 className="mb-3.5 text-[13px] font-semibold uppercase tracking-[0.13em] text-ink-3">
+            How many pages?
+          </h3>
+          <div
+            className="flex flex-wrap gap-2.5"
+            role="group"
+            aria-label="Number of pages"
+          >
             {PAGE_OPTIONS.map(p => (
               <button
                 key={p.id}
-                className={`chip${pages.id === p.id ? " active" : ""}`}
+                className={`cursor-pointer rounded-full border px-[17px] py-[11px] text-[14.5px] font-medium leading-none transition-colors duration-200 ${
+                  pages.id === p.id
+                    ? "border-btn bg-btn text-btn-text"
+                    : "border-line-strong text-ink-2 hover:border-ink-2"
+                }`}
                 onClick={() => setPages(p)}
               >
-                {p.label} <small>{p.note}</small>
+                {p.label}{" "}
+                <small className="ml-1.5 text-[12.5px] opacity-75">
+                  {p.note}
+                </small>
               </button>
             ))}
           </div>
         </div>
 
-        <div className="est-group">
-          <h3>Add-ons (optional)</h3>
-          <div className="chips" role="group" aria-label="Optional add-ons">
+        <div className="mb-[30px] last:mb-0">
+          <h3 className="mb-3.5 text-[13px] font-semibold uppercase tracking-[0.13em] text-ink-3">
+            Add-ons (optional)
+          </h3>
+          <div
+            className="flex flex-wrap gap-2.5"
+            role="group"
+            aria-label="Optional add-ons"
+          >
             {ADDONS.map(a => (
               <button
                 key={a.id}
-                className={`chip${
-                  addons.some(x => x.id === a.id) ? " active" : ""
+                className={`cursor-pointer rounded-full border px-[17px] py-[11px] text-[14.5px] font-medium leading-none transition-colors duration-200 ${
+                  addons.some(x => x.id === a.id)
+                    ? "border-btn bg-btn text-btn-text"
+                    : "border-line-strong text-ink-2 hover:border-ink-2"
                 }`}
                 onClick={() => toggleAddon(a)}
               >
-                {a.label} <small>+${a.add.toLocaleString("en-US")}</small>
+                {a.label}{" "}
+                <small className="ml-1.5 text-[12.5px] opacity-75">
+                  +${a.add.toLocaleString("en-US")}
+                </small>
               </button>
             ))}
           </div>
         </div>
       </div>
 
-      <div className="est-total">
-        <span className="lab">Your estimate</span>
-        <div className="est-num">{fmt(shown)}</div>
-        <p className="est-tier">{tierLabel}</p>
-        <p className="est-note">
+      <div className="flex flex-col justify-center bg-bg p-[30px] lg:p-10">
+        <span className="text-[13px] font-semibold uppercase tracking-[0.13em] text-ink-3">
+          Your estimate
+        </span>
+        <div className="my-1 font-serif text-[clamp(52px,6vw,72px)] font-medium leading-[1.05] tracking-tight tabular-nums">
+          {fmt(shown)}
+        </div>
+        <p className="text-[15px] font-semibold text-accent">{tierLabel}</p>
+        <p className="mb-5 mt-2.5 text-[13.5px] text-ink-2">
           A starting point, not a trap — you&rsquo;ll get a fixed quote in
           writing before anything is owed.
         </p>
         <button className="btn btn-solid" onClick={requestQuote}>
           Request this quote <Icon name="arrow" />
         </button>
-        <p className="est-break">
+        <p className="mt-4 text-[13px] text-ink-3">
           Base $600 · {pages.label} ·{" "}
           {addons.length ? addons.map(a => a.label).join(", ") : "no add-ons"}
         </p>
-        <p className="est-sub">
+        <p className="mt-1.5 text-[13px] text-ink-3">
           Optional monthly: care $50/mo · automations from $39/mo
         </p>
       </div>

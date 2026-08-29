@@ -1,13 +1,15 @@
-// Renders any icon from the sprite: <Icon name="arrow" />
-export default function Icon({ name, className = "ic" }) {
+const BASE =
+  "h-[1.1em] w-[1.1em] shrink-0 fill-none stroke-current stroke-[1.9] [stroke-linecap:round] [stroke-linejoin:round]";
+
+// Pass className to override sizing entirely; omit it for the default
+export default function Icon({ name, className = "" }) {
   return (
-    <svg className={className} aria-hidden="true">
+    <svg className={`icon ${className}`} aria-hidden="true">
       <use href={`#i-${name}`} />
     </svg>
   );
 }
-
-// Rendered once in layout.js — every <Icon> references these symbols
+// Unchanged — sprite rendered once in layout.js
 export function IconSprite() {
   return (
     <svg

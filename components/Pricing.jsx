@@ -11,6 +11,8 @@ const TIERS = [
     price: "$600",
     plus: false,
     featured: false,
+    budget: "launch",
+    ctaLabel: "Start a Launch project",
     features: [
       "1–3 pages, custom design",
       "Mobile-first & fast",
@@ -19,8 +21,6 @@ const TIERS = [
       "2 revision rounds",
       "Live in 2 weeks",
     ],
-    budget: "launch",
-    ctaLabel: "Start a Launch project",
   },
   {
     name: "Growth",
@@ -30,6 +30,8 @@ const TIERS = [
     plus: false,
     featured: true,
     tag: "Most booked",
+    budget: "growth",
+    ctaLabel: "Start a Growth project",
     features: [
       "Everything in Launch",
       "Up to 6 pages + blog",
@@ -38,8 +40,6 @@ const TIERS = [
       "Booking or simple payments",
       "4 revisions + 30-day support",
     ],
-    budget: "growth",
-    ctaLabel: "Start a Growth project",
   },
   {
     name: "Custom",
@@ -48,6 +48,8 @@ const TIERS = [
     price: "$3,000",
     plus: true,
     featured: false,
+    budget: "custom",
+    ctaLabel: "Request a custom quote",
     features: [
       "Everything in Growth",
       "E-commerce, portals, integrations",
@@ -55,8 +57,6 @@ const TIERS = [
       "Ongoing partnership option",
       "Quoted to scope, always fixed",
     ],
-    budget: "custom",
-    ctaLabel: "Request a custom quote",
   },
 ];
 
@@ -95,64 +95,116 @@ const MONTHLY_PLANS = [
 
 export default function Pricing() {
   return (
-    <section className="sec" id="pricing">
+    <section id="pricing" className="sec">
       <div className="wrap">
-        <header className="sec-head reveal">
+        <header className="reveal mb-[52px] max-w-[640px]">
           <p className="eyebrow">Pricing</p>
-          <h2>Honest pricing, in the open.</h2>
-          <p className="lede">
-            Every project starts at <strong>$600</strong> and is quoted fixed,
+          <h2 className="mb-3 mt-3.5 font-serif text-[clamp(30px,4.6vw,44px)] font-medium leading-[1.08] tracking-tight">
+            Honest pricing, in the open.
+          </h2>
+          <p className="text-[17.5px] text-ink-2">
+            Every project starts at{" "}
+            <strong className="font-semibold">$600</strong> and is quoted fixed,
             in writing, before any work begins. The number we say is the number
             you pay.
           </p>
         </header>
 
         <Reveal>
-          <div className="tiers">
-            {TIERS.map(t => (
-              <article
-                className={`tier${t.featured ? " featured" : ""}`}
-                key={t.name}
-              >
-                <div className="tier-name">
-                  {t.tag && <span className="tier-tag">{t.tag}</span>}
-                  <h3>{t.name}</h3>
-                  <p className="tier-sub">{t.sub}</p>
-                </div>
-                <div className="tier-price">
-                  <span className="tier-from">{t.from}</span>
-                  <strong>{t.price}</strong>
-                  {t.plus && <span className="plus">+</span>}
-                </div>
-                <ul className="tier-feats">
-                  {t.features.map(f => (
-                    <li key={f}>
-                      <Icon name="check" /> {f}
-                    </li>
-                  ))}
-                </ul>
-                <TierButton
-                  tier={`${t.name} — ${t.price}`}
-                  budget={t.budget}
-                  ariaLabel={t.ctaLabel}
-                />
-              </article>
-            ))}
+          <div className="overflow-hidden rounded-[18px] border border-line-strong bg-raised transition-colors duration-[350ms]">
+            {TIERS.map(t => {
+              const tone = t.featured
+                ? {
+                    row: "bg-feat border-feat-line",
+                    name: "text-feat-text",
+                    sub: "text-feat-2",
+                    from: "text-feat-2",
+                    price: "text-feat-text",
+                    plus: "text-feat-accent",
+                    feat: "text-feat-2",
+                    check: "text-feat-accent",
+                    go: "border-feat-line text-feat-text hover:border-feat-text hover:bg-feat-text hover:text-feat",
+                  }
+                : {
+                    row: "border-line",
+                    name: "text-ink",
+                    sub: "text-ink-3",
+                    from: "text-ink-3",
+                    price: "text-ink",
+                    plus: "text-accent",
+                    feat: "text-ink-2",
+                    check: "text-accent-bright",
+                    go: "border-line-strong text-ink hover:border-btn hover:bg-btn hover:text-btn-text",
+                  };
+              return (
+                <article
+                  key={t.name}
+                  className={`grid gap-5 border-b p-[30px] last:border-b-0 lg:grid-cols-[1.15fr_210px_1.7fr_56px] lg:items-center lg:gap-[30px] lg:p-[36px] ${tone.row}`}
+                >
+                  <div>
+                    {t.tag && (
+                      <span className="mb-2.5 inline-block rounded-full bg-amber-500 px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.1em] text-slate-900">
+                        {t.tag}
+                      </span>
+                    )}
+                    <h3
+                      className={`mb-[3px] font-serif text-[25px] font-medium ${tone.name}`}
+                    >
+                      {t.name}
+                    </h3>
+                    <p className={`text-[14.5px] ${tone.sub}`}>{t.sub}</p>
+                  </div>
+                  <div>
+                    <span
+                      className={`mb-0.5 block text-[12px] font-semibold uppercase tracking-[0.12em] ${tone.from}`}
+                    >
+                      {t.from}
+                    </span>
+                    <strong
+                      className={`font-serif text-[46px] font-medium leading-none tracking-tight ${tone.price}`}
+                    >
+                      {t.price}
+                    </strong>
+                    {t.plus && (
+                      <span className={`text-[46px] ${tone.plus}`}>+</span>
+                    )}
+                  </div>
+                  <ul className="flex flex-wrap gap-x-[22px] gap-y-2">
+                    {t.features.map(f => (
+                      <li
+                        key={f}
+                        className={`flex items-center gap-[7px] text-[14.5px] ${tone.feat}`}
+                      >
+                        <Icon name="check" className={tone.check} /> {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <TierButton
+                    tier={`${t.name} — ${t.price}`}
+                    budget={t.budget}
+                    ariaLabel={t.ctaLabel}
+                    btnClass={tone.go}
+                  />
+                </article>
+              );
+            })}
           </div>
         </Reveal>
 
         <Reveal>
-          <div className="pricing-notes">
-            <div>
-              <strong>Payment plans</strong>
-              <span>
+          <div className="mt-[26px] grid gap-6 sm:grid-cols-2">
+            <div className="border-l-2 border-accent-bright pl-4">
+              <strong className="block text-[15px]">Payment plans</strong>
+              <span className="text-[14.5px] text-ink-2">
                 50% to start, 50% at launch. Three-part splits on larger
                 projects. No hidden fees, ever.
               </span>
             </div>
-            <div>
-              <strong>Your domain &amp; hosting</strong>
-              <span>
+            <div className="border-l-2 border-accent-bright pl-4">
+              <strong className="block text-[15px]">
+                Your domain &amp; hosting
+              </strong>
+              <span className="text-[14.5px] text-ink-2">
                 Not included — stays in your name, typically $40–60/year total.
                 We set it up, you own it.
               </span>
@@ -161,27 +213,40 @@ export default function Pricing() {
         </Reveal>
 
         <Reveal>
-          <p className="plans-label">Optional monthly plans — cancel anytime</p>
-          <div className="plans">
+          <p className="mt-12 text-[13px] font-semibold uppercase tracking-[0.13em] text-ink-3">
+            Optional monthly plans — cancel anytime
+          </p>
+          <div className="mt-[18px] grid md:grid-cols-3">
             {MONTHLY_PLANS.map(p => (
-              <div className="plan" key={p.name}>
-                <h3>{p.name}</h3>
-                <p className="plan-price">
+              <div
+                key={p.name}
+                className="border-t border-line py-[18px] lg:border-l lg:border-t-0 lg:py-1 lg:pl-6 lg:first:border-l-0 lg:first:pl-0"
+              >
+                <h3 className="mb-2.5 font-serif text-[19px] font-medium">
+                  {p.name}
+                </h3>
+                <p className="font-serif text-[36px] font-medium leading-none tracking-tight">
                   ${p.price}
-                  <span>/mo</span>
+                  <span className="font-sans text-[14px] tracking-normal text-ink-3">
+                    /mo
+                  </span>
                 </p>
-                <p className="plan-desc">{p.desc}</p>
-                <ul>
+                <p className="mb-3.5 mt-2 text-[14px] text-ink-3">{p.desc}</p>
+                <ul className="grid gap-2">
                   {p.points.map(pt => (
-                    <li key={pt}>
-                      <Icon name="check" /> {pt}
+                    <li
+                      key={pt}
+                      className="flex items-start gap-2 text-[14px] text-ink-2"
+                    >
+                      <Icon name="check" className="mt-1 text-accent-bright" />{" "}
+                      {pt}
                     </li>
                   ))}
                 </ul>
               </div>
             ))}
           </div>
-          <p className="plans-note">
+          <p className="mt-[22px] max-w-[72ch] text-[13.5px] text-ink-3">
             Monthly plans cover running and maintaining your automations —
             hosting, monitoring, updates, and fixes when a connected service
             changes. Building new workflows is one-time work, typically

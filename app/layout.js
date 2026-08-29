@@ -3,7 +3,6 @@ import { Fraunces, Instrument_Sans } from "next/font/google";
 import { IconSprite } from "@/components/Icon";
 import RevealWatcher from "@/components/RevealWatcher";
 
-// EDIT:DOMAIN — change this once and every canonical/OG/Twitter URL updates
 const SITE_URL = "https://dkm-tau.vercel.app";
 
 const fraunces = Fraunces({
@@ -12,11 +11,10 @@ const fraunces = Fraunces({
   display: "swap",
   variable: "--font-fraunces",
 });
-
 const instrumentSans = Instrument_Sans({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-sans",
+  variable: "--font-instrument",
 });
 
 export const metadata = {
@@ -38,13 +36,15 @@ export const viewport = {
   ],
 };
 
-// Runs before first paint: no flash of the wrong theme
 const themeInit = `(function(){try{var t=localStorage.getItem('dkm-theme')||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);document.documentElement.classList.add('js')}catch(e){}})()`;
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${fraunces.variable} ${instrumentSans.variable}`}>
+    <html lang="en" suppressHydrationWarning className="scroll-smooth">
+      <body
+        className={`${fraunces.variable} ${instrumentSans.variable} bg-bg font-sans
+        text-[16.5px] leading-[1.6] text-ink antialiased transition-colors duration-[350ms]`}
+      >
         <script dangerouslySetInnerHTML={{ __html: themeInit }} />
         <IconSprite />
         <RevealWatcher />

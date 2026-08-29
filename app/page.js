@@ -75,7 +75,10 @@ const jsonLd = {
 export default function Home() {
   return (
     <>
-      <a className="skip" href="#main">
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:z-[100] focus:rounded-lg focus:bg-accent-bright focus:px-4 focus:py-2.5 focus:font-semibold focus:text-slate-900"
+      >
         Skip to content
       </a>
       <Header />
