@@ -8,6 +8,7 @@ export default function Footer() {
           <div>
             <span className="font-serif text-[28px] font-semibold text-ink">
               DKM<b className="text-accent-bright">.</b>
+              <p className="text-[10px]">Digital Keys & Marketing</p>
             </span>
             <p className="mt-2.5 max-w-[30ch] text-[15px] text-ink-2">
               Web design &amp; development for small businesses. Websites from{" "}

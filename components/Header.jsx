@@ -33,6 +33,7 @@ export default function Header() {
           className="font-serif text-[23px] font-semibold tracking-tight text-ink"
         >
           DKM<b className="text-accent-bright">.</b>
+          <p className="text-[10px]">Digital Keys & Marketing</p>
         </a>
 
         <nav className="ml-auto hidden gap-[26px] lg:flex" aria-label="Main">
