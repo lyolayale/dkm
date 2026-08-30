@@ -138,9 +138,9 @@ export default function Pricing() {
           </h2>
           <p className="text-[17.5px] text-ink-2">
             Every project starts at{" "}
-            <strong className="font-semibold">$600</strong> and is quoted fixed,
-            in writing, before any work begins. The number we say is the number
-            you pay.
+            <strong className="font-semibold">$600</strong> and is quoted in
+            writing, before any work begins. The number we say is the number you
+            pay.
           </p>
         </header>
 
