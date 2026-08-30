@@ -82,7 +82,7 @@ export default function Footer() {
               </li>
               <li>
                 <span className="text-[15px] text-ink-2">
-                  2084 Faulkner Rd NE, Atlanta, GA 30324
+                  2084 Faulkner Rd NE, Suite B, Atlanta, GA 30324
                 </span>
               </li>
             </ul>
