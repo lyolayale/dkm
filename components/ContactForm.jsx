@@ -29,7 +29,11 @@ export default function ContactForm() {
 
   // Live estimate from the shared store — updates in real time as the user
   // changes options in the estimator, even while the form is in view.
-  const estimateState = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const estimateState = useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    getServerSnapshot,
+  );
   const estimateLines = summaryLines(estimateState);
   const estimateTotal = activeTotal(estimateState);
   const hasEstimate = estimateState.touched && estimateLines.length > 0;
