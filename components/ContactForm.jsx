@@ -1,7 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useSyncExternalStore } from "react";
 import Icon from "./Icon";
+import {
+  subscribe,
+  getSnapshot,
+  getServerSnapshot,
+  summaryLines,
+  activeTotal,
+  fmt,
+} from "@/lib/estimateStore";
 
 const WEBHOOK = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL || "";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -17,6 +26,13 @@ export default function ContactForm() {
   const [status, setStatus] = useState("idle");
   const [firstName, setFirstName] = useState("");
   const nameRef = useRef(null);
+
+  // Live estimate from the shared store — updates in real time as the user
+  // changes options in the estimator, even while the form is in view.
+  const estimateState = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const estimateLines = summaryLines(estimateState);
+  const estimateTotal = activeTotal(estimateState);
+  const hasEstimate = estimateState.touched && estimateLines.length > 0;
 
   const set = (key, value) => {
     setForm(f => ({ ...f, [key]: value }));

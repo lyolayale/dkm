@@ -1,6 +1,5 @@
 import Reveal from "./Reveal";
 import Icon from "./Icon";
-import ConsultingEstimator from "./ConsultingEstimator";
 
 // The co-founder's half of DKM: marketing & consulting services + prices.
 // Prices shown here mirror the estimator data in lib/estimateStore.js —
@@ -128,9 +127,27 @@ export default function Consulting() {
           </div>
         </Reveal>
 
-        {/* --- CONSULTING SCOPE ESTIMATOR (synced with the Pricing estimator) --- */}
+        {/* --- NOTE: estimator now lives in the Pricing section as a unified component --- */}
         <Reveal>
-          <ConsultingEstimator />
+          <div className="mt-[64px] rounded-[18px] border border-line-strong bg-raised p-[30px] text-center md:p-10">
+            <p className="text-[13px] font-semibold uppercase tracking-[0.13em] text-ink-3">
+              Price estimator
+            </p>
+            <p className="mt-2 font-serif text-[22px] font-medium">
+              Combine website + consulting in one quote.
+            </p>
+            <p className="mx-auto mt-2 max-w-[40ch] text-[14.5px] text-ink-2">
+              The interactive estimator in the Pricing section above lets you
+              build a website estimate, a consulting estimate, or combine both
+              into a single fixed quote.
+            </p>
+            <a
+              className="btn btn-solid hover:bg-amber-500 mt-5 inline-flex"
+              href="#estimator"
+            >
+              Open the estimator <Icon name="arrow" />
+            </a>
+          </div>
         </Reveal>
       </div>
     </section>

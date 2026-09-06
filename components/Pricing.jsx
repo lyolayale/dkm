@@ -4,7 +4,7 @@ import { useState } from "react";
 import Reveal from "./Reveal";
 import Icon from "./Icon";
 import TierButton from "./TierButton";
-import Estimator from "./Estimator";
+import PricingEstimator from "./PricingEstimator";
 
 const TIERS = [
   {
@@ -349,7 +349,7 @@ export default function Pricing() {
         </Reveal>
         {/* --- PROJECT SCOPE ESTIMATOR MODULE --- */}
         <Reveal>
-          <Estimator />
+          <PricingEstimator />
         </Reveal>
       </div>
     </section>
