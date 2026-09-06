@@ -7,19 +7,27 @@ export default function Hero() {
       <div className="wrap">
         <div className="grid items-end gap-8 md:grid-cols-[1.25fr_0.75fr]">
           <Reveal>
-            <p className="eyebrow">Web design &amp; development</p>
+            <p className="eyebrow">Web design · Marketing &amp; Consulting</p>
             <h1 className="mt-3.5 max-w-[12ch] font-serif text-[clamp(40px,6.4vw,68px)] font-medium leading-[1.08] tracking-tight">
               A website that wins you{" "}
               <em className="italic text-accent">work.</em>
             </h1>
             <p className="my-[22px] max-w-[46ch] text-[18.5px] text-ink-2">
-              DKM designs and builds fast, professional websites for small
-              businesses — design, build, and launch included, starting at{" "}
-              <strong className="font-semibold">$600</strong>.
+              Fast, professional websites for small businesses from{" "}
+              <strong className="font-semibold">$600</strong> — plus the
+              business side to grow them: structure, paperwork, and
+              face-to-face outreach, handled by our co-founder.
             </p>
             <div className="flex flex-wrap gap-3">
               <a className="btn btn-solid hover:bg-amber-500" href="#contact">
                 Start yours — $600 <Icon name="arrow" />
+              </a>
+              {/* Highlighted consulting CTA — accent outline stands out from the plain ghost */}
+              <a
+                className="btn border-accent-bright/45 text-accent hover:border-accent-bright hover:bg-accent-bright/10 hover:text-accent-bright"
+                href="#consulting"
+              >
+                Marketing &amp; consulting <Icon name="arrow" />
               </a>
               <a className="btn btn-ghost" href="#pricing">
                 See pricing <Icon name="up" />
@@ -36,6 +44,9 @@ export default function Hero() {
             </div>
             <p className="mt-2.5 text-[13px] tracking-[0.04em] text-ink-3">
               The starting price — real, fixed, in writing.
+            </p>
+            <p className="mt-1 text-[13px] tracking-[0.04em] text-ink-3">
+              Marketing &amp; consulting from $65/hr.
             </p>
           </div>
         </div>

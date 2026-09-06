@@ -8,98 +8,106 @@ import {
   subscribe,
   getSnapshot,
   getServerSnapshot,
-  selectPages,
-  toggleWebAddon,
-  PAGE_OPTIONS,
-  WEB_ADDONS,
-  webTotal,
+  selectEngagement,
+  toggleConsultService,
+  ENGAGEMENTS,
+  CONSULT_ADDONS,
   consultTotal,
+  webTotal,
   combinedTotal,
-  consultSummaryLines,
+  webSummaryLines,
   fmt,
   budgetFor,
 } from "@/lib/estimateStore";
 
-export default function Estimator() {
-  // Selections live in lib/estimateStore.js so this estimator and the
-  // consulting estimator (Consulting section) stay in sync — change one, both update.
+// Consulting / marketing estimator — reads and writes the SAME store as the
+// website estimator in components/Estimator.jsx, so the two stay in sync.
+export default function ConsultingEstimator() {
   const state = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
-  const pages = PAGE_OPTIONS.find(p => p.id === state.pagesId);
-  const addons = WEB_ADDONS.filter(a => state.addonIds.includes(a.id));
-  const total = webTotal(state);
+  const engagement = ENGAGEMENTS.find(e => e.id === state.engagementId);
+  const services = CONSULT_ADDONS.filter(a =>
+    state.serviceIds.includes(a.id),
+  );
+  const total = consultTotal(state);
   const shown = useAnimatedNumber(total);
 
-  // Synced view of the consulting estimator (shown once it has been used)
-  const conTouched = state.conTouched;
-  const con = consultTotal(state);
+  // Synced view of the website estimator (shown once it has been used)
+  const webTouched = state.webTouched;
+  const web = webTotal(state);
   const combined = combinedTotal(state);
 
   const tierLabel =
-    total < 1500
-      ? "Launch range"
-      : total < 3000
-        ? "Growth range"
-        : "Custom range — quoted to scope";
+    total < 600
+      ? "Foundations range"
+      : total < 1000
+        ? "Growth partner range"
+        : "Full partnership — quoted to scope";
 
   function requestQuote() {
     const lines = [
-      "Hi! I used the price estimator on your site.",
+      "Hi! I used the consulting estimator on your site.",
       "",
-      `Pages: ${pages.label}`,
-      `Add-ons: ${addons.length ? addons.map(a => a.label).join(", ") : "none"}`,
-      `Estimate: about ${fmt(total)}`,
+      `Engagement: ${engagement.label}`,
+      `Add-ons: ${services.length ? services.map(a => a.label).join(", ") : "none"}`,
+      `Consulting estimate: about ${fmt(total)}`,
     ];
 
-    // The consulting estimator writes to the same store — include its picks
-    if (conTouched) {
+    // The website estimator writes to the same store — include its picks
+    if (webTouched) {
       lines.push(
         "",
-        ...consultSummaryLines(state),
+        ...webSummaryLines(state),
         `Combined estimate: about ${fmt(combined)}`,
       );
     }
 
     lines.push("", "A bit about my business: ");
-    prefillAndGo({ message: lines.join("\n"), budget: budgetFor(combined) });
+    prefillAndGo({
+      message: lines.join("\n"),
+      // Budget buckets in the contact form map to website tiers, so only set
+      // one when the website side is part of this quote.
+      budget: webTouched ? budgetFor(combined) : undefined,
+    });
   }
+
   return (
     <div
-      id="estimator"
+      id="consulting-estimator"
       className="reveal mt-[84px] grid overflow-hidden rounded-[18px] border border-line-strong bg-raised transition-colors duration-[350ms] lg:grid-cols-[1.35fr_1fr]"
     >
       {/* --- LEFT COLUMN: SELECTION CONTROLS --- */}
       <div className="border-b border-line p-[30px] lg:border-b-0 lg:border-r lg:p-10">
-        {/* Page Step Options */}
+        {/* Engagement Level Options */}
         <div className="mb-[30px] last:mb-0">
           <h3 className="mb-3.5 text-[13px] font-semibold uppercase tracking-[0.13em] text-ink-3">
-            How many pages?
+            What do you need?
           </h3>
           <div
             className="flex flex-wrap gap-2.5"
             role="group"
-            aria-label="Number of pages"
+            aria-label="Consulting engagement"
           >
-            {PAGE_OPTIONS.map(p => (
+            {ENGAGEMENTS.map(e => (
               <button
-                key={p.id}
+                key={e.id}
                 className={`cursor-pointer rounded-full border px-[17px] py-[11px] text-[14.5px] font-medium leading-none transition-colors duration-200 ${
-                  pages.id === p.id
+                  engagement.id === e.id
                     ? "border-btn bg-btn text-btn-text"
                     : "border-line-strong text-ink-2 hover:border-ink-2"
                 }`}
-                onClick={() => selectPages(p.id)}
+                onClick={() => selectEngagement(e.id)}
               >
-                {p.label}{" "}
+                {e.label}{" "}
                 <small className="ml-1.5 text-[12.5px] opacity-75">
-                  {p.note}
+                  {e.note}
                 </small>
               </button>
             ))}
           </div>
         </div>
 
-        {/* Dynamic Capability Addon Pills */}
+        {/* Consulting Addon Pills */}
         <div className="mb-[30px] last:mb-0">
           <h3 className="mb-3.5 text-[13px] font-semibold uppercase tracking-[0.13em] text-ink-3">
             Add-ons (optional)
@@ -107,17 +115,17 @@ export default function Estimator() {
           <div
             className="flex flex-wrap gap-2.5"
             role="group"
-            aria-label="Optional add-ons"
+            aria-label="Optional consulting add-ons"
           >
-            {WEB_ADDONS.map(a => (
+            {CONSULT_ADDONS.map(a => (
               <button
                 key={a.id}
                 className={`cursor-pointer rounded-full border px-[17px] py-[11px] text-[14.5px] font-medium leading-none transition-colors duration-200 ${
-                  addons.some(x => x.id === a.id)
+                  services.some(x => x.id === a.id)
                     ? "border-btn bg-btn text-btn-text"
                     : "border-line-strong text-ink-2 hover:border-ink-2"
                 }`}
-                onClick={() => toggleWebAddon(a.id)}
+                onClick={() => toggleConsultService(a.id)}
               >
                 {a.label}{" "}
                 <small className="ml-1.5 text-[12.5px] opacity-75">
@@ -142,15 +150,15 @@ export default function Estimator() {
 
         <p className="text-[15px] font-semibold text-accent">{tierLabel}</p>
         <p className="mb-5 mt-2.5 text-[13.5px] text-ink-2">
-          A starting point, not a trap — you&rsquo;ll get a fixed quote in
+          A starting point — she&rsquo;ll confirm scope and a fixed price in
           writing before anything is owed.
         </p>
 
-        {/* Synced with the consulting estimator in the Consulting section */}
-        {conTouched && (
+        {/* Synced with the website estimator in the Pricing section */}
+        {webTouched && (
           <p className="mb-5 rounded-[10px] border border-line-strong bg-raised px-3.5 py-2.5 text-[13.5px] text-ink-2">
-            Consulting selected:{" "}
-            <b className="font-semibold text-ink">{fmt(con)}</b> — combined
+            Website selected:{" "}
+            <b className="font-semibold text-ink">{fmt(web)}</b> — combined
             estimate{" "}
             <b className="font-semibold text-accent">{fmt(combined)}</b>
           </p>
@@ -165,13 +173,14 @@ export default function Estimator() {
 
         {/* Summary Footer Text Details */}
         <p className="mt-4 text-[13px] text-ink-3">
-          Base $600 · {pages.label} ·{" "}
-          {addons.length ? addons.map(a => a.label).join(", ") : "no add-ons"}
+          Base $350 · {engagement.label} ·{" "}
+          {services.length
+            ? services.map(a => a.label).join(", ")
+            : "no add-ons"}
         </p>
 
         <p className="mt-1.5 text-[13px] text-ink-3">
-          Optional monthly: care $50/mo · automations from $39/mo · app care
-          $79/mo
+          Ongoing: weekly outreach days from $600/mo · advisory from $250/mo
         </p>
       </div>
     </div>

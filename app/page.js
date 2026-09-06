@@ -1,6 +1,7 @@
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import Services from "@/components/Services";
+import Consulting from "@/components/Consulting";
 import Process from "@/components/Process";
 import Pricing from "@/components/Pricing";
 import FAQ from "@/components/FAQ";
@@ -62,6 +63,20 @@ const jsonLd = {
       },
     },
     {
+      "@type": "Service",
+      name: "Marketing & business consulting for small businesses",
+      serviceType: "Business consulting & client outreach",
+      areaServed: "Worldwide",
+      provider: { "@type": "Organization", name: "DKM" },
+      offers: {
+        "@type": "AggregateOffer",
+        priceCurrency: "USD",
+        lowPrice: "65",
+        highPrice: "850",
+        offerCount: "3",
+      },
+    },
+    {
       "@type": "FAQPage",
       mainEntity: FAQ_ITEMS.map(item => ({
         "@type": "Question",
@@ -85,6 +100,7 @@ export default function Home() {
       <main id="main">
         <Hero />
         <Services />
+        <Consulting />
         <Process />
         <Pricing />
         <FAQ />

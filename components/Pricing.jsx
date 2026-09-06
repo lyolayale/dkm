@@ -146,7 +146,7 @@ export default function Pricing() {
 
         {/* --- UPFRONT TIERS LIST --- */}
         <Reveal>
-          <div className="overflow-hidden rounded-[18px] border border-line-strong bg-raised transition-colors duration-[350ms]">
+          <div className="overflow-hidden rounded-[18px] border border-line-strong bg-raised transition-colors duration-350">
             {TIERS.map(t => {
               const isSelected = selectedTier === t.name;
               const tone = t.featured
@@ -179,7 +179,7 @@ export default function Pricing() {
                   onClick={() => setSelectedTier(t.name)}
                   className={`grid gap-5 border-b p-[30px] last:border-b-0 lg:grid-cols-[1.15fr_210px_1.7fr_56px] lg:items-center lg:gap-[30px] lg:p-[36px] cursor-pointer transition-all ${
                     tone.row
-                  } ${isSelected ? "ring-2 ring-accent-bright ring-offset-2 ring-offset-raised" : "opacity-90 hover:opacity-100"}`}
+                  } ${isSelected ? "ring-2 ring-accent-bright ring-offset-2 ring-offset-raised" : ""}`}
                 >
                   <div>
                     {t.tag && (

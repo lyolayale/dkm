@@ -5,6 +5,7 @@ import Icon from "./Icon";
 
 const LINKS = [
   { href: "#services", label: "Services" },
+  { href: "#consulting", label: "Consulting" },
   { href: "#pricing", label: "Pricing" },
   { href: "#faq", label: "FAQ" },
   { href: "#contact", label: "Contact" },

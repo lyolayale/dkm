@@ -6,10 +6,13 @@ export default function Footer() {
       <div className="wrap">
         <div className="mb-14 grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr]">
           <div>
+            <div className="relative w-25 hoverflow-hidden rounded-2xl"></div>
+
             <span className="font-serif text-[28px] font-semibold text-ink">
               DKM<b className="text-accent-bright">.</b>
               <p className="text-[10px]">Digital Keys & Marketing</p>
             </span>
+
             <p className="mt-2.5 max-w-[30ch] text-[15px] text-ink-2">
               Web design &amp; development for small businesses. Websites from{" "}
               <b className="font-serif text-[17px] font-medium text-accent">
@@ -30,6 +33,14 @@ export default function Footer() {
                   className="text-[15px] text-ink-2 transition-colors hover:text-ink"
                 >
                   Services
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#consulting"
+                  className="text-[15px] text-ink-2 transition-colors hover:text-ink"
+                >
+                  Consulting
                 </a>
               </li>
               <li>
