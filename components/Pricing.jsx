@@ -5,100 +5,7 @@ import Reveal from "./Reveal";
 import Icon from "./Icon";
 import TierButton from "./TierButton";
 import PricingEstimator from "./PricingEstimator";
-
-const TIERS = [
-  {
-    name: "Launch",
-    sub: "Your first real website.",
-    from: "One-time",
-    price: "$600",
-    plus: false,
-    featured: false,
-    budget: "launch",
-    ctaLabel: "Start a Launch project",
-    features: [
-      "1–3 pages, custom design",
-      "Mobile-first & fast",
-      "Contact form",
-      "Google SEO basics",
-      "2 revision rounds",
-      "Live in 2 weeks",
-    ],
-  },
-  {
-    name: "Growth",
-    sub: "For businesses ready to grow.",
-    from: "One-time",
-    price: "$1,500",
-    plus: false,
-    featured: true,
-    tag: "Most booked",
-    budget: "growth",
-    ctaLabel: "Start a Growth project",
-    features: [
-      "Everything in Launch",
-      "Up to 6 pages + blog",
-      "CMS you can edit yourself",
-      "Advanced SEO + analytics",
-      "Booking or simple payments",
-      "4 revisions + 30-day support",
-    ],
-  },
-  {
-    name: "Custom",
-    sub: "Built around whatever you need.",
-    from: "From",
-    price: "$3,000",
-    plus: true,
-    featured: false,
-    budget: "custom",
-    ctaLabel: "Request a custom quote",
-    features: [
-      "Everything in Growth",
-      "E-commerce & web portals",
-      "Supabase database apps",
-      "Custom workflow automation",
-      "Ongoing partnership option",
-      "Quoted to scope, always fixed",
-    ],
-  },
-];
-
-const MONTHLY_PLANS = [
-  {
-    id: "care",
-    name: "Care plan",
-    price: 50,
-    desc: "Your website, kept healthy.",
-    points: [
-      "Edits & content updates",
-      "Updates & backups",
-      "Priority support",
-    ],
-  },
-  {
-    id: "lite",
-    name: "Automation Lite",
-    price: 39,
-    desc: "Form handling & notifications.",
-    points: [
-      "Up to 3 workflows",
-      "n8n hosting & monitoring",
-      "Fixes within 2 business days",
-    ],
-  },
-  {
-    id: "app",
-    name: "App Care",
-    price: 79,
-    desc: "Database & backend security.",
-    points: [
-      "Database schema versioning",
-      "Supabase RLS & auth audits",
-      "1 hr of data tweaks monthly",
-    ],
-  },
-];
+import { TIERS, MONTHLY_PLANS, calcMonthly, fmt } from "@/lib/pricing";
 
 export default function Pricing() {
   // Track selected upfront tier name and active monthly items
@@ -106,27 +13,33 @@ export default function Pricing() {
   const [selectedMonthly, setSelectedMonthly] = useState(["care"]); // care active by default
 
   const handleToggleMonthly = id => {
-    setSelectedMonthly(prev =>
-      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id],
-    );
+    setSelectedMonthly(prev => {
+      // Lite and Standard are mutually exclusive — one automation plan at a time
+      if (id === "lite" && !prev.includes("lite")) {
+        return [...prev.filter(x => x !== "standard"), "lite"];
+      }
+      if (id === "standard" && !prev.includes("standard")) {
+        return [...prev.filter(x => x !== "lite"), "standard"];
+      }
+      return prev.includes(id)
+        ? prev.filter(item => item !== id)
+        : [...prev, id];
+    });
   };
 
-  // Get pricing value numbers cleanly
+  // Get pricing value numbers cleanly (single source: lib/pricing.js)
   const activeTierObj = TIERS.find(t => t.name === selectedTier);
-  const basePriceNum = parseInt(activeTierObj.price.replace(/[^0-9]/g, ""), 10);
+  const basePriceNum = activeTierObj.priceNum;
 
-  // Calculate total monthly aggregation
-  let totalMonthly = selectedMonthly.reduce((sum, itemId) => {
-    const plan = MONTHLY_PLANS.find(p => p.id === itemId);
-    return sum + (plan ? plan.price : 0);
-  }, 0);
-
-  // Apply bundle discount rule: Care Plan ($50) + App Care ($79) together saves $15
-  const hasBundleDiscount =
-    selectedMonthly.includes("care") && selectedMonthly.includes("app");
-  if (hasBundleDiscount) {
-    totalMonthly -= 15;
-  }
+  // Monthly math + bundles from single source of truth
+  const {
+    subtotal: monthlySubtotal,
+    discount: monthlyDiscount,
+    total: totalMonthly,
+    activeBundles,
+  } = calcMonthly(selectedMonthly);
+  const hasBundleDiscount = activeBundles.length > 0;
+  const yearOne = basePriceNum + totalMonthly * 12;
 
   return (
     <section id="pricing" className="sec">
@@ -140,11 +53,11 @@ export default function Pricing() {
             Every project starts at{" "}
             <strong className="font-semibold">$600</strong> and is quoted in
             writing, before any work begins. The number we say is the number you
-            pay.
+            pay — one-time build + optional monthly, all shown together below.
           </p>
         </header>
 
-        {/* --- UPFRONT TIERS LIST --- */}
+        {/* --- UPFRONT TIERS LIST (each tier shows its correlated automation cost) --- */}
         <Reveal>
           <div className="overflow-hidden rounded-[18px] border border-line-strong bg-raised transition-colors duration-350">
             {TIERS.map(t => {
@@ -159,6 +72,7 @@ export default function Pricing() {
                     plus: "text-feat-accent",
                     feat: "text-feat-2",
                     check: "text-feat-accent",
+                    note: "text-feat-2",
                     go: "border-feat-line text-feat-text hover:border-feat-text hover:bg-feat-text hover:text-feat",
                   }
                 : {
@@ -170,6 +84,7 @@ export default function Pricing() {
                     plus: "text-accent",
                     feat: "text-ink-2",
                     check: "text-accent-bright",
+                    note: "text-ink-3",
                     go: "border-line-strong text-ink hover:border-btn hover:bg-btn hover:text-btn-text",
                   };
 
@@ -216,24 +131,39 @@ export default function Pricing() {
                       <span className={`text-[46px] ${tone.plus}`}>+</span>
                     )}
                   </div>
-                  <ul className="flex flex-wrap gap-x-[22px] gap-y-2">
-                    {t.features.map(f => (
-                      <li
-                        key={f}
-                        className={`flex items-center gap-[7px] text-[14.5px] ${tone.feat}`}
-                      >
-                        <Icon
-                          name="check"
-                          className={
-                            t.featured && isSelected
-                              ? "text-amber-400"
-                              : tone.check
-                          }
-                        />
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
+                  <div>
+                    <ul className="flex flex-wrap gap-x-[22px] gap-y-2">
+                      {t.features.map(f => (
+                        <li
+                          key={f}
+                          className={`flex items-center gap-[7px] text-[14.5px] ${tone.feat}`}
+                        >
+                          <Icon
+                            name="check"
+                            className={
+                              t.featured && isSelected
+                                ? "text-amber-400"
+                                : tone.check
+                            }
+                          />
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
+                    {t.automationNote && (
+                      <p className={`mt-3 text-[13px] leading-snug ${tone.note}`}>
+                        <span className="font-semibold">
+                          ⚙ Automation:{" "}
+                        </span>
+                        {t.automationNote}
+                      </p>
+                    )}
+                    {t.typicalMonthly && (
+                      <p className={`mt-1 text-[13px] font-medium ${tone.note}`}>
+                        {t.typicalMonthly}
+                      </p>
+                    )}
+                  </div>
                   <div onClick={e => e.stopPropagation()}>
                     <TierButton
                       tier={`${t.name} — ${t.price}`}
@@ -250,7 +180,7 @@ export default function Pricing() {
 
         {/* --- GENERAL BUSINESS TERMS --- */}
         <Reveal>
-          <div className="mt-[26px] grid gap-6 sm:grid-cols-2">
+          <div className="mt-[26px] grid gap-6 sm:grid-cols-3">
             <div className="border-l-2 border-accent-bright pl-4">
               <strong className="block text-[15px]">Payment plans</strong>
               <span className="text-[14.5px] text-ink-2">
@@ -267,6 +197,13 @@ export default function Pricing() {
                 We set it up, you own it.
               </span>
             </div>
+            <div className="border-l-2 border-accent-bright pl-4">
+              <strong className="block text-[15px]">Automation builds</strong>
+              <span className="text-[14.5px] text-ink-2">
+                New workflows are one-time builds ($150–$350 each), then run on
+                Lite $39/mo or Standard $99/mo. Quoted in writing first.
+              </span>
+            </div>
           </div>
         </Reveal>
 
@@ -276,14 +213,19 @@ export default function Pricing() {
             <p className="text-[13px] font-semibold uppercase tracking-[0.13em] text-ink-3">
               Optional monthly plans — Choose all that apply (They Stack)
             </p>
-            {hasBundleDiscount && (
-              <span className="text-[12px] font-bold text-emerald-500 uppercase tracking-wider bg-emerald-500/10 px-2 py-0.5 rounded animate-pulse">
-                🎉 App Bundle Activated (-$15/mo)
-              </span>
-            )}
+            <div className="flex flex-wrap gap-2">
+              {activeBundles.map(b => (
+                <span
+                  key={b.id}
+                  className="text-[12px] font-bold text-emerald-500 uppercase tracking-wider bg-emerald-500/10 px-2 py-0.5 rounded animate-pulse"
+                >
+                  🎉 {b.label}
+                </span>
+              ))}
+            </div>
           </div>
 
-          <div className="mt-[18px] grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div className="mt-[18px] grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
             {MONTHLY_PLANS.map(p => {
               const isChecked = selectedMonthly.includes(p.id);
               return (
@@ -334,18 +276,65 @@ export default function Pricing() {
                       </li>
                     ))}
                   </ul>
+                  {p.footnote && (
+                    <p className="mt-3 border-t border-line pt-2.5 text-[12.5px] leading-snug text-ink-3">
+                      {p.footnote}
+                    </p>
+                  )}
                 </div>
               );
             })}
           </div>
 
           <p className="mt-[22px] max-w-[72ch] text-[13.5px] text-ink-3">
-            Monthly plans are fully additive depending on your unique site
-            requirements. Selecting both visual front-end{" "}
-            <strong>Care Plan</strong> and full <strong>App Care</strong>{" "}
-            databases applies an immediate bundle deduction value right in your
-            dashboard tracker.
+            Monthly plans stack to match your site. <strong>Care $50</strong> +
+            <strong> Lite $39</strong> = $89/mo. <strong>Care $50</strong> +
+            <strong> Standard $99</strong> = $149 →{" "}
+            <strong>$129/mo bundled</strong> (save $20).{" "}
+            <strong>Care $50</strong> + <strong>App Care $79</strong> = $129 →{" "}
+            <strong>$114/mo bundled</strong> (save $15). Lite and Standard are
+            mutually exclusive — you only ever pay for one automation plan.
+            New workflows are one-time builds ($150–$350 each), quoted first.
           </p>
+
+          {/* --- LIVE TOTAL TRACKER: everything up front --- */}
+          <div className="mt-6 flex flex-col gap-3 rounded-xl border border-accent-bright/40 bg-accent-bright/[0.05] p-5 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-[12px] font-bold uppercase tracking-[0.13em] text-ink-3">
+                Your total — {activeTierObj.name} selected
+              </p>
+              <p className="mt-1 font-serif text-[24px] font-medium leading-tight text-ink">
+                {fmt(basePriceNum)} one-time
+                <span className="text-ink-3"> + </span>
+                {fmt(totalMonthly)}
+                <span className="font-sans text-[15px] text-ink-3">/mo</span>
+                {monthlyDiscount > 0 && (
+                  <span className="ml-2 align-middle rounded bg-emerald-500/15 px-2 py-0.5 font-sans text-[12px] font-bold text-emerald-600">
+                    saves {fmt(monthlyDiscount)}/mo
+                  </span>
+                )}
+              </p>
+              <p className="mt-1 text-[13px] text-ink-3">
+                {monthlySubtotal !== totalMonthly
+                  ? `Monthly ${fmt(monthlySubtotal)} − bundle ${fmt(monthlyDiscount)} = ${fmt(totalMonthly)}/mo · `
+                  : ""}
+                Year-one all-in:{" "}
+                <strong className="text-ink">{fmt(yearOne)}</strong> (
+                {fmt(basePriceNum)} + {fmt(totalMonthly)} × 12). Cancel monthly
+                anytime.
+              </p>
+            </div>
+            <div onClick={e => e.stopPropagation()}>
+              <TierButton
+                tier={`${activeTierObj.name} — ${activeTierObj.price} + ${fmt(totalMonthly)}/mo`}
+                budget={activeTierObj.budget}
+                ariaLabel={`Request ${activeTierObj.name} at ${fmt(basePriceNum)} plus ${fmt(totalMonthly)} monthly`}
+                btnClass="border-btn bg-btn text-btn-text hover:bg-amber-500 !inline-flex !w-auto !h-auto px-6 py-3 rounded-full text-[15px] font-semibold gap-2"
+              >
+                Get this total
+              </TierButton>
+            </div>
+          </div>
         </Reveal>
         {/* --- PROJECT SCOPE ESTIMATOR MODULE --- */}
         <Reveal>

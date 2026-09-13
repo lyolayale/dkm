@@ -227,7 +227,9 @@ export default function PricingEstimator() {
         </p>
 
         <p className="mt-1.5 text-[13px] text-ink-3">
-          Optional monthly: care $50/mo · automations from $39/mo · advisory from $250/mo
+          One-time automation builds: $150–$350 each. Optional monthly: Care
+          $50/mo · Lite $39/mo (≤3 flows) · Standard $99/mo (≤10 flows, $129
+          bundled with Care) · App Care $79/mo (DB sites).
         </p>
       </div>
     </div>

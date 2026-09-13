@@ -3,10 +3,15 @@
 import Icon from "./Icon";
 import { prefillAndGo } from "@/lib/quoteBus";
 
-export default function TierButton({ tier, budget, ariaLabel, btnClass = "" }) {
+export default function TierButton({ tier, budget, ariaLabel, btnClass = "", children }) {
+  const isPill = btnClass.includes("!inline-flex");
   return (
     <button
-      className={`hidden shrink-0 cursor-pointer items-center justify-center rounded-full border transition-colors duration-200 lg:inline-flex h-[50px] w-[50px] ${btnClass}`}
+      className={
+        isPill
+          ? `shrink-0 cursor-pointer items-center justify-center rounded-full border transition-colors duration-200 inline-flex ${btnClass}`
+          : `hidden shrink-0 cursor-pointer items-center justify-center rounded-full border transition-colors duration-200 lg:inline-flex h-[50px] w-[50px] ${btnClass}`
+      }
       aria-label={ariaLabel}
       onClick={() =>
         prefillAndGo({
@@ -16,6 +21,7 @@ export default function TierButton({ tier, budget, ariaLabel, btnClass = "" }) {
       }
     >
       <Icon name="arrow" />
+      {children ? <span>{children}</span> : null}
     </button>
   );
 }
