@@ -2,7 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 import Icon from "./Icon";
-import { prefillAndGo } from "@/lib/quoteBus";
+import { goToForm } from "@/lib/quoteBus";
 import { useAnimatedNumber } from "@/lib/useAnimatedNumber";
 import {
   subscribe,
@@ -23,8 +23,8 @@ import {
   consultTotal,
   combinedTotal,
   summaryLines,
-  prefillMessage,
-  budgetFor,
+  touchEstimate,
+  monthlyFor,
   fmt,
 } from "@/lib/estimateStore";
 
@@ -34,6 +34,7 @@ export default function PricingEstimator() {
   const mode = MODES.find(m => m.id === state.mode);
   const total = activeTotal(state);
   const shown = useAnimatedNumber(total);
+  const monthly = monthlyFor(state);
 
   const showWeb = state.mode === "web" || state.mode === "both";
   const showConsult = state.mode === "consult" || state.mode === "both";
@@ -52,10 +53,10 @@ export default function PricingEstimator() {
           : "Custom range — quoted to scope";
 
   function requestQuote() {
-    prefillAndGo({
-      message: prefillMessage(state),
-      budget: budgetFor(total),
-    });
+    // Selections already live-sync into the contact form — just make sure the
+    // current (possibly default) state is marked used, then take them there.
+    touchEstimate();
+    goToForm();
   }
 
   return (
@@ -195,6 +196,18 @@ export default function PricingEstimator() {
               Consulting: <b className="font-semibold text-ink">{fmt(consultTotal(state))}</b>
             </p>
           </div>
+        )}
+
+        {monthly.total > 0 && (
+          <p className="mt-3 mb-2 text-[13.5px] text-ink-2">
+            Monthly plans:{" "}
+            <b className="font-semibold text-ink">{fmt(monthly.total)}/mo</b>
+            {monthly.discount > 0 && (
+              <span className="ml-1.5 text-[12.5px] font-medium text-emerald-600">
+                bundle −{fmt(monthly.discount)}/mo
+              </span>
+            )}
+          </p>
         )}
 
         <p className="mb-5 mt-2.5 text-[13.5px] text-ink-2">

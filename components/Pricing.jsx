@@ -1,44 +1,42 @@
 "use client";
 
-import { useState } from "react";
+import { useSyncExternalStore } from "react";
 import Reveal from "./Reveal";
 import Icon from "./Icon";
 import TierButton from "./TierButton";
 import PricingEstimator from "./PricingEstimator";
-import { TIERS, MONTHLY_PLANS, calcMonthly, fmt } from "@/lib/pricing";
+import { TIERS, MONTHLY_PLANS, fmt } from "@/lib/pricing";
+import {
+  subscribe,
+  getSnapshot,
+  getServerSnapshot,
+  selectTier,
+  toggleMonthlyPlan,
+  matchedTier,
+  monthlyFor,
+} from "@/lib/estimateStore";
 
 export default function Pricing() {
-  // Track selected upfront tier name and active monthly items
-  const [selectedTier, setSelectedTier] = useState("Launch");
-  const [selectedMonthly, setSelectedMonthly] = useState(["care"]); // care active by default
+  // Shared store — the same state the estimator and contact form read, so the
+  // whole pricing page stays in one dynamic loop.
+  const state = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
-  const handleToggleMonthly = id => {
-    setSelectedMonthly(prev => {
-      // Lite and Standard are mutually exclusive — one automation plan at a time
-      if (id === "lite" && !prev.includes("lite")) {
-        return [...prev.filter(x => x !== "standard"), "lite"];
-      }
-      if (id === "standard" && !prev.includes("standard")) {
-        return [...prev.filter(x => x !== "lite"), "standard"];
-      }
-      return prev.includes(id)
-        ? prev.filter(item => item !== id)
-        : [...prev, id];
-    });
-  };
+  // The "selected" package is derived from the estimator total: it follows the
+  // estimator live, and clicking a card re-configures the estimator to match.
+  const selectedTier = matchedTier(state).name;
+  const selectedMonthly = state.monthlyIds;
 
   // Get pricing value numbers cleanly (single source: lib/pricing.js)
   const activeTierObj = TIERS.find(t => t.name === selectedTier);
   const basePriceNum = activeTierObj.priceNum;
 
-  // Monthly math + bundles from single source of truth
+  // Monthly math + bundles from the shared store (calcMonthly under the hood)
   const {
     subtotal: monthlySubtotal,
     discount: monthlyDiscount,
     total: totalMonthly,
     activeBundles,
-  } = calcMonthly(selectedMonthly);
-  const hasBundleDiscount = activeBundles.length > 0;
+  } = monthlyFor(state);
   const yearOne = basePriceNum + totalMonthly * 12;
 
   return (
@@ -91,7 +89,7 @@ export default function Pricing() {
               return (
                 <article
                   key={t.name}
-                  onClick={() => setSelectedTier(t.name)}
+                  onClick={() => selectTier(t.name)}
                   className={`grid gap-5 border-b p-[30px] last:border-b-0 lg:grid-cols-[1.15fr_210px_1.7fr_56px] lg:items-center lg:gap-[30px] lg:p-[36px] cursor-pointer transition-all ${
                     tone.row
                   } ${isSelected ? "ring-2 ring-accent-bright ring-offset-2 ring-offset-raised" : ""}`}
@@ -166,8 +164,7 @@ export default function Pricing() {
                   </div>
                   <div onClick={e => e.stopPropagation()}>
                     <TierButton
-                      tier={`${t.name} — ${t.price}`}
-                      budget={t.budget}
+                      tierName={t.name}
                       ariaLabel={t.ctaLabel}
                       btnClass={tone.go}
                     />
@@ -231,7 +228,7 @@ export default function Pricing() {
               return (
                 <div
                   key={p.id}
-                  onClick={() => handleToggleMonthly(p.id)}
+                  onClick={() => toggleMonthlyPlan(p.id)}
                   className={`border rounded-xl p-5 cursor-pointer transition-all duration-200 select-none ${
                     isChecked
                       ? "border-accent-bright bg-accent-bright/[0.03] shadow-sm"
@@ -326,8 +323,7 @@ export default function Pricing() {
             </div>
             <div onClick={e => e.stopPropagation()}>
               <TierButton
-                tier={`${activeTierObj.name} — ${activeTierObj.price} + ${fmt(totalMonthly)}/mo`}
-                budget={activeTierObj.budget}
+                tierName={activeTierObj.name}
                 ariaLabel={`Request ${activeTierObj.name} at ${fmt(basePriceNum)} plus ${fmt(totalMonthly)} monthly`}
                 btnClass="border-btn bg-btn text-btn-text hover:bg-amber-500 !inline-flex !w-auto !h-auto px-6 py-3 rounded-full text-[15px] font-semibold gap-2"
               >

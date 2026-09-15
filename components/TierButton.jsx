@@ -1,9 +1,15 @@
 "use client";
 
 import Icon from "./Icon";
-import { prefillAndGo } from "@/lib/quoteBus";
+import { goToForm } from "@/lib/quoteBus";
+import { selectTier } from "@/lib/estimateStore";
 
-export default function TierButton({ tier, budget, ariaLabel, btnClass = "", children }) {
+export default function TierButton({
+  tierName,
+  ariaLabel,
+  btnClass = "",
+  children,
+}) {
   const isPill = btnClass.includes("!inline-flex");
   return (
     <button
@@ -13,12 +19,13 @@ export default function TierButton({ tier, budget, ariaLabel, btnClass = "", chi
           : `hidden shrink-0 cursor-pointer items-center justify-center rounded-full border transition-colors duration-200 lg:inline-flex h-[50px] w-[50px] ${btnClass}`
       }
       aria-label={ariaLabel}
-      onClick={() =>
-        prefillAndGo({
-          message: `Hi! I'm interested in the ${tier} package. Here's a bit about my business: `,
-          budget,
-        })
-      }
+      onClick={() => {
+        // Configure the shared estimator to this package — the estimator
+        // readout, tier highlight and contact form all update live — then
+        // jump to the form.
+        selectTier(tierName);
+        goToForm();
+      }}
     >
       <Icon name="arrow" />
       {children ? <span>{children}</span> : null}

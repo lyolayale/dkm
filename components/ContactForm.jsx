@@ -9,7 +9,9 @@ import {
   getServerSnapshot,
   summaryLines,
   activeTotal,
-  fmt,
+  prefillMessage,
+  budgetFor,
+  estimatePayload,
 } from "@/lib/estimateStore";
 
 const WEBHOOK = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL || "";
@@ -22,6 +24,9 @@ export default function ContactForm() {
     budget: "",
     message: "",
   });
+  // Fields the user has taken over by hand — once set, the estimator and
+  // prefill events stop overwriting them.
+  const [manual, setManual] = useState({ budget: false, message: false });
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState("idle");
   const [firstName, setFirstName] = useState("");
@@ -38,19 +43,33 @@ export default function ContactForm() {
   const estimateTotal = activeTotal(estimateState);
   const hasEstimate = estimateState.touched && estimateLines.length > 0;
 
-  const set = (key, value) => {
+  // Dynamic fill: as soon as the estimator is touched, budget + message mirror
+  // it live — unless the user has taken that field over by hand. Manual edits
+  // always win; explicit prefill events (tier cards) fill the fields directly
+  // and give way to the store once the estimator is used.
+  const syncedBudget = estimateState.touched ? budgetFor(estimateTotal) : "";
+  const syncedMessage = estimateState.touched
+    ? prefillMessage(estimateState)
+    : "";
+  const budget = manual.budget ? form.budget : syncedBudget || form.budget;
+  const message = manual.message ? form.message : syncedMessage || form.message;
+
+  const set = (key, value, manualEdit = false) => {
     setForm(f => ({ ...f, [key]: value }));
     setErrors(e => ({ ...e, [key]: false }));
+    if (manualEdit) setManual(m => ({ ...m, [key]: true }));
   };
 
   useEffect(() => {
     function onPrefill(e) {
-      const { message, budget } = e.detail || {};
-      setForm(f => ({
-        ...f,
-        message: message !== undefined ? message : f.message,
-        budget: budget !== undefined ? budget : f.budget,
-      }));
+      const { message: pMessage, budget: pBudget } = e.detail || {};
+      if (pMessage !== undefined || pBudget !== undefined) {
+        setForm(f => ({
+          ...f,
+          message: pMessage !== undefined ? pMessage : f.message,
+          budget: pBudget !== undefined ? pBudget : f.budget,
+        }));
+      }
       setErrors({});
       const reduced = window.matchMedia(
         "(prefers-reduced-motion: reduce)",
@@ -75,7 +94,7 @@ export default function ContactForm() {
     const nextErrors = {
       name: form.name.trim() === "",
       email: !EMAIL_RE.test(form.email.trim()),
-      message: form.message.trim().length < 10,
+      message: message.trim().length < 10,
     };
     setErrors(nextErrors);
     if (nextErrors.name || nextErrors.email || nextErrors.message) return;
@@ -84,10 +103,16 @@ export default function ContactForm() {
     const payload = {
       name: form.name.trim(),
       email: form.email.trim(),
-      budget: form.budget || "not sure",
-      message: form.message.trim(),
+      budget: budget || "not sure",
+      message: message.trim(),
       sentAt: new Date().toISOString(),
+      // Lets one n8n webhook route leads via a Switch node: a plain contact
+      // submission vs. an estimator-guided lead.
+      source: hasEstimate ? "pricing-estimator" : "contact-form",
     };
+    // Structured, n8n-friendly estimate (ids + labels + totals) so downstream
+    // workflows can branch on mode, budget bucket, or individual add-ons.
+    if (hasEstimate) payload.estimate = estimatePayload(estimateState);
 
     try {
       if (WEBHOOK) {
@@ -189,8 +214,8 @@ export default function ContactForm() {
           <select
             id="in-budget"
             className="field-input border-line-strong"
-            value={form.budget}
-            onChange={e => set("budget", e.target.value)}
+            value={budget}
+            onChange={e => set("budget", e.target.value, true)}
           >
             <option value="">Not sure yet</option>
             <option value="launch">Launch — $600–1,500</option>
@@ -198,6 +223,13 @@ export default function ContactForm() {
             <option value="custom">Custom — $3,000+</option>
           </select>
         </div>
+
+        {hasEstimate && !manual.message && (
+          <p className="text-[12.5px] text-ink-3">
+            Estimator selections attached — this updates live as you adjust the
+            estimate. Edit it and it&rsquo;s yours.
+          </p>
+        )}
 
         <div>
           <label
@@ -210,8 +242,8 @@ export default function ContactForm() {
             id="in-msg"
             placeholder="What does your business do, and what do you need the website to achieve?"
             className={`field-input min-h-[130px] resize-y ${errors.message ? "border-accent-bright" : "border-line-strong"}`}
-            value={form.message}
-            onChange={e => set("message", e.target.value)}
+            value={message}
+            onChange={e => set("message", e.target.value, true)}
           />
           {errors.message && (
             <p className="mt-1.5 text-[13px] font-medium text-accent">
