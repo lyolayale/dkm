@@ -138,8 +138,10 @@ export default function ContactForm() {
           (data?.error || "Lead submit failed (" + res.status + ")") + detailStr,
         );
       }
-      if (process.env.NODE_ENV !== "production" && data?.details) {
-        console.warn("[lead] partial backend failure:", data.details);
+      // Always surface per-sink status (including production) so a silent
+      // n8n failure can't masquerade as success.
+      if (data?.details) {
+        console.warn("[lead] backend details:", data.details);
       }
       setFirstName(cleanName.split(" ")[0]);
       setStatus("ok");
