@@ -1,0 +1,12 @@
+{
+  "name": "DKM · Digital Keys & Marketing",
+  "short_name": "DKM",
+  "description": "Atlanta-based web design & marketing consulting, working 100% remote nationwide. Small business websites from $600.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#f8fafc",
+  "icons": [
+    { "src": "/icon", "sizes": "512x512", "type": "image/png" }
+  ]
+}

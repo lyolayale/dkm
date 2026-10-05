@@ -30,11 +30,13 @@ export default function Header() {
       <div className="wrap flex h-[66px] items-center gap-7">
         <a
           href="#top"
-          aria-label="DKM — home"
+          aria-label="DKM — Digital Keys and Marketing, home"
           className="font-serif text-[23px] font-semibold tracking-tight text-ink"
         >
           DKM<b className="text-accent-bright">.</b>
-          <p className="text-[10px]">Digital Keys & Marketing</p>
+          <span className="block text-[10px] font-sans font-normal tracking-wide">
+            Digital Keys & Marketing
+          </span>
         </a>
 
         <nav className="ml-auto hidden gap-[26px] lg:flex" aria-label="Main">

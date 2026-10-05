@@ -7,16 +7,18 @@ export default function Hero() {
       <div className="wrap">
         <div className="grid items-end gap-8 md:grid-cols-[1.25fr_0.75fr]">
           <Reveal>
-            <p className="eyebrow">Web design · Marketing &amp; Consulting</p>
+            <p className="eyebrow">
+              Web design Atlanta · Remote nationwide · Marketing &amp; Consulting
+            </p>
             <h1 className="mt-3.5 max-w-[12ch] font-serif text-[clamp(40px,6.4vw,68px)] font-medium leading-[1.08] tracking-tight">
               A website that wins you{" "}
               <em className="italic text-accent">work.</em>
             </h1>
             <p className="my-[22px] max-w-[46ch] text-[18.5px] text-ink-2">
-              Fast, professional websites for small businesses from{" "}
-              <strong className="font-semibold">$600</strong> — plus the
-              business side to grow them: structure, paperwork, and
-              face-to-face outreach, handled by our co-founder.
+              Atlanta-based web design for small businesses from{" "}
+              <strong className="font-semibold">$600</strong> — working 100%
+              remote nationwide, plus the business side to grow them: structure,
+              paperwork, and face-to-face outreach, handled by our co-founder.
             </p>
             <div className="flex flex-wrap gap-3">
               <a className="btn btn-solid hover:bg-amber-500" href="#contact">

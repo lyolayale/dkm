@@ -1,16 +1,18 @@
 const YEAR = new Date().getFullYear();
 
+import { CONTACT } from "@/lib/site";
+
 export default function Footer() {
   return (
     <footer className="border-t border-line pb-[34px] pt-16">
       <div className="wrap">
         <div className="mb-14 grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr]">
           <div>
-            <div className="relative w-25 hoverflow-hidden rounded-2xl"></div>
-
             <span className="font-serif text-[28px] font-semibold text-ink">
               DKM<b className="text-accent-bright">.</b>
-              <p className="text-[10px]">Digital Keys & Marketing</p>
+              <span className="block text-[10px] font-sans font-normal tracking-wide">
+                Digital Keys & Marketing
+              </span>
             </span>
 
             <p className="mt-2.5 max-w-[30ch] text-[15px] text-ink-2">
@@ -77,24 +79,22 @@ export default function Footer() {
             <ul className="grid gap-[9px]">
               <li>
                 <a
-                  href="tel:+15551234567"
+                  href={`tel:${CONTACT.phoneTel}`}
                   className="text-[15px] text-ink-2 transition-colors hover:text-ink"
                 >
-                  (555) 123-4567
+                  {CONTACT.phoneDisplay}
                 </a>
               </li>
               <li>
                 <a
-                  href="mailto:hello@dkmstudio.co"
+                  href={`mailto:${CONTACT.email}`}
                   className="text-[15px] text-ink-2 transition-colors hover:text-ink"
                 >
-                  hello@dkmstudio.co
+                  {CONTACT.email}
                 </a>
               </li>
               <li>
-                <span className="text-[15px] text-ink-2">
-                  2084 Faulkner Rd NE, Suite B, Atlanta, GA 30324
-                </span>
+                <span className="text-[15px] text-ink-2">{CONTACT.full}</span>
               </li>
             </ul>
           </div>

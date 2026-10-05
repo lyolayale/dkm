@@ -1,16 +1,11 @@
 import Reveal from "./Reveal";
 import Icon from "./Icon";
 import ContactForm from "./ContactForm";
+import { CONTACT } from "@/lib/site";
 
-// ============================================================
-// EDIT:PHONE — display text, and tel: link (digits + country code only)
-// EDIT:ADDRESS — your street address; the map, directions link, and
-// display text all derive from this one line
-// ============================================================
-const PHONE_DISPLAY = "(555) 123-4567";
-const PHONE_TEL = "+15551234567";
-const ADDRESS = "2084 Faulkner Rd NE, Suite B, Atlanta, GA 30324";
-const MAP_QUERY = encodeURIComponent(ADDRESS);
+// Contact details derive from lib/site.js — the map embed, directions link,
+// tel:/mailto: links, display text, and JSON-LD all stay in sync automatically.
+const MAP_QUERY = encodeURIComponent(CONTACT.full);
 
 export default function Contact() {
   return (
@@ -31,31 +26,31 @@ export default function Contact() {
             <li className="flex items-center gap-3 text-[17px] font-semibold">
               <Icon name="phone" className="text-accent-bright" />
               <a
-                href={`tel:${PHONE_TEL}`}
+                href={`tel:${CONTACT.phoneTel}`}
                 className="text-accent underline-offset-[3px] hover:underline"
               >
-                {PHONE_DISPLAY}
+                {CONTACT.phoneDisplay}
               </a>
             </li>
             <li className="flex items-center gap-3 text-[17px] font-semibold">
               <Icon name="mail" className="text-accent-bright" />
               <a
-                href="mailto:admin@digitalkeysandmarketing.com"
+                href={`mailto:${CONTACT.email}`}
                 className="text-accent underline-offset-[3px] hover:underline"
               >
-                admin@digitalkeysandmarketing.com
+                {CONTACT.email}
               </a>
             </li>
             <li className="flex items-center gap-3 text-[17px] font-semibold">
               <Icon name="pin" className="text-accent-bright" />
               <address className="not-italic text-ink">
                 <a
-                  href={`https://maps.app.goo.gl/XY66QYaBKBMvob7CA`}
+                  href={`https://www.google.com/maps/search/?api=1&query=${MAP_QUERY}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="underline-offset-[3px] hover:underline"
                 >
-                  {ADDRESS}
+                  {CONTACT.full}
                 </a>
               </address>
             </li>
