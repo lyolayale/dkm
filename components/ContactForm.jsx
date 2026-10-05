@@ -14,7 +14,9 @@ import {
   estimatePayload,
 } from "@/lib/estimateStore";
 
-const WEBHOOK = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL || "";
+// All lead traffic goes through the server route `/api/leads`, which holds
+// the service_role key + webhook URL privately. No NEXT_PUBLIC_* keys needed
+// in the browser, so no Supabase warnings and no secret leakage.
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 export default function ContactForm() {
@@ -100,34 +102,43 @@ export default function ContactForm() {
     if (nextErrors.name || nextErrors.email || nextErrors.message) return;
 
     setStatus("sending");
+    const cleanName = form.name.trim();
+    const cleanEmail = form.email.trim();
+    const cleanBudget = budget || "not sure";
+    const cleanMessage = message.trim();
+    const source = hasEstimate ? "pricing-estimator" : "contact-form";
+    const estimate = hasEstimate ? estimatePayload(estimateState) : null;
     const payload = {
-      name: form.name.trim(),
-      email: form.email.trim(),
-      budget: budget || "not sure",
-      message: message.trim(),
+      name: cleanName,
+      email: cleanEmail,
+      budget: cleanBudget,
+      message: cleanMessage,
       sentAt: new Date().toISOString(),
       // Lets one n8n webhook route leads via a Switch node: a plain contact
       // submission vs. an estimator-guided lead.
-      source: hasEstimate ? "pricing-estimator" : "contact-form",
+      source,
     };
     // Structured, n8n-friendly estimate (ids + labels + totals) so downstream
     // workflows can branch on mode, budget bucket, or individual add-ons.
-    if (hasEstimate) payload.estimate = estimatePayload(estimateState);
+    if (estimate) payload.estimate = estimate;
 
     try {
-      if (WEBHOOK) {
-        const res = await fetch(WEBHOOK, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-        if (!res.ok) throw new Error("Webhook returned " + res.status);
-      } else {
-        await new Promise(r => setTimeout(r, 650));
+      const res = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data?.error || "Lead submit failed (" + res.status + ")");
       }
-      setFirstName(form.name.trim().split(" ")[0]);
+      if (process.env.NODE_ENV !== "production" && data?.details) {
+        console.warn("[lead] partial backend failure:", data.details);
+      }
+      setFirstName(cleanName.split(" ")[0]);
       setStatus("ok");
     } catch (err) {
+      console.error("[lead] submit failed:", err);
       setStatus("error");
     }
   }
