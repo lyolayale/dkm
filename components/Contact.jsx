@@ -40,10 +40,10 @@ export default function Contact() {
             <li className="flex items-center gap-3 text-[17px] font-semibold">
               <Icon name="mail" className="text-accent-bright" />
               <a
-                href="mailto:hello@dkmstudio.co"
+                href="mailto:admin@digitalkeysandmarketing.com"
                 className="text-accent underline-offset-[3px] hover:underline"
               >
-                hello@dkmstudio.co
+                admin@digitalkeysandmarketing.com
               </a>
             </li>
             <li className="flex items-center gap-3 text-[17px] font-semibold">
