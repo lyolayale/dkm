@@ -130,7 +130,13 @@ export default function ContactForm() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        throw new Error(data?.error || "Lead submit failed (" + res.status + ")");
+        console.error("[lead] save failed details:", data?.details);
+        const detailStr = data?.details
+          ? " — " + JSON.stringify(data.details)
+          : "";
+        throw new Error(
+          (data?.error || "Lead submit failed (" + res.status + ")") + detailStr,
+        );
       }
       if (process.env.NODE_ENV !== "production" && data?.details) {
         console.warn("[lead] partial backend failure:", data.details);
