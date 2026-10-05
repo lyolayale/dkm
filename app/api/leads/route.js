@@ -3,26 +3,36 @@
 //   NEXT_PUBLIC_SUPABASE_URL  (or SUPABASE_URL)
 //   SUPABASE_SERVICE_ROLE_KEY
 //   N8N_WEBHOOK_URL           (or NEXT_PUBLIC_N8N_WEBHOOK_URL)
+//
+// NOTE: env vars are read inside the handler (not at module top level) so
+// Vercel runtime env is always picked up, even if the bundle was built
+// before the vars were added.
 import { createClient } from "@supabase/supabase-js";
 
-const SUPABASE_URL =
-  process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || "";
-const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
-const WEBHOOK =
-  process.env.N8N_WEBHOOK_URL ||
-  process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL ||
-  "";
+export const dynamic = "force-dynamic";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
-function supabaseAdmin() {
-  if (!SUPABASE_URL || !SERVICE_KEY) return null;
-  return createClient(SUPABASE_URL, SERVICE_KEY, {
+function getConfig() {
+  const supabaseUrl =
+    process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || "";
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+  const webhook =
+    process.env.N8N_WEBHOOK_URL ||
+    process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL ||
+    "";
+  return { supabaseUrl, serviceKey, webhook };
+}
+
+function supabaseAdmin(supabaseUrl, serviceKey) {
+  if (!supabaseUrl || !serviceKey) return null;
+  return createClient(supabaseUrl, serviceKey, {
     auth: { persistSession: false },
   });
 }
 
 export async function POST(req) {
+  const { supabaseUrl, serviceKey, webhook } = getConfig();
   let body = {};
   try {
     body = await req.json();
@@ -69,7 +79,7 @@ export async function POST(req) {
   let supabaseId = null;
 
   // 1) Supabase insert with the privileged server key (bypasses anon RLS issues).
-  const admin = supabaseAdmin();
+  const admin = supabaseAdmin(supabaseUrl, serviceKey);
   if (admin) {
     const { data, error } = await admin
       .from("leads")
@@ -91,7 +101,7 @@ export async function POST(req) {
 
   // 2) Forward to n8n (server-side so the non-public N8N_WEBHOOK_URL works).
   let n8n = "skipped";
-  if (WEBHOOK) {
+  if (webhook) {
     try {
       const payload = {
         name,
@@ -103,7 +113,7 @@ export async function POST(req) {
         ...(estimate ? { estimate } : {}),
         ...(supabaseId ? { supabaseId } : {}),
       };
-      const res = await fetch(WEBHOOK, {
+      const res = await fetch(webhook, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
