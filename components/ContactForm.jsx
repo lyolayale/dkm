@@ -14,8 +14,8 @@ import {
   estimatePayload,
 } from "@/lib/estimateStore";
 
-// All lead traffic goes through the server route `/api/leads`, which holds
-// the service_role key + webhook URL privately. No NEXT_PUBLIC_* keys needed
+// All lead traffic goes through the server route `/api/leads`, which forwards
+// to n8n (the single writer to Supabase + sender of the email). No keys needed
 // in the browser, so no Supabase warnings and no secret leakage.
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
