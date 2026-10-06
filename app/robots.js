@@ -1,4 +1,4 @@
-import { IS_PRODUCTION } from "@/lib/site";
+import { IS_PRODUCTION, SITE_URL } from "@/lib/site";
 
 // Remote-deploy safe robots:
 //  • Production  → index everything, point at the sitemap.
@@ -18,6 +18,6 @@ export default function robots() {
         disallow: ["/api/"],
       },
     ],
-    sitemap: "https://digitalkeysandmarketing.com/sitemap.xml",
+    sitemap: `${SITE_URL}/sitemap.xml`,
   };
 }
